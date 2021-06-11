@@ -59,7 +59,5 @@ using namespace std;
 	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
 #endif
 
-#include "udpcomm.h"
-
 #endif // __YOSTEMPLATE_H__
 

@@ -1,7 +1,7 @@
 
 TARGET   = yos_code_template
 CSRCS    = 
-CCSRCS   = main.cc udpcomm.cc
+CCSRCS   = main.cc cc_udpcomm.cc
 LIBS     = -lpthread
 
 CFLAGS  += -g -MD
@@ -46,3 +46,8 @@ gtags:
 	@-gtags
 clean_gtags:
 	rm -f GPATH GRTAGS GTAGS
+
+
+test:
+	gdb $(TARGET)
+
