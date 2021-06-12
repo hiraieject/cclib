@@ -29,35 +29,42 @@
 
 cc_udpsend::cc_udpsend (void)
 {
-	DBGPR ("called()\n");
+	// initialize
 	connected = false;
 	sock = -1;
+	disconnect ();
 }
 	
 cc_udpsend::~cc_udpsend ()
 {
-	DBGPR ("called()\n");
 	disconnect();
-	DBGPR ("udpsend deleted\n");
 }
 
 bool
-cc_udpsend::connect (unsigned int port, in_addr_t ipaddr)
+cc_udpsend::connect (unsigned int port, in_addr_t ipaddr, bool bcast)
 {
+	if (connected) {
+		disconnect ();
+	}
+	// create socket
+	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+		DBGPR ("error socket()\n");
+		return false;
+	}
+	// set broadcast flag
+	if (bcast) {
+		int yes = 1;
+		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&yes, sizeof(yes));
+ 	}
 	// address
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	addr.sin_addr.s_addr = ipaddr;
 
-	// create socket
-	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-		DBGPR ("error socket()\n");
-		disconnect ();
-		return false;
-	}
 	// connect success
 	connected = true;
+	DBGPR ("udpsend connected\n");
 	return true;
 }
 bool
@@ -65,8 +72,10 @@ cc_udpsend::disconnect (void) {
 	if (sock != -1) {
 		close(sock);
 		sock = -1;
+		DBGPR ("udpsend connected\n");
 	}
 	connected = false;
+	DBGPR ("udpsend disconnected\n");
 	return true;
 }
 bool
@@ -74,12 +83,16 @@ cc_udpsend::getstatus (void) {
 	return connected;
 }
 
-bool
+ssize_t
 cc_udpsend::send (unsigned char *dptr, int dsize)
 {
-	//printf ("#### send data %dbyte\n", dsize);
-	sendto(sock, dptr, dsize, 0, (struct sockaddr *)&addr, sizeof(addr));
-	return true;
+	ssize_t ret = sendto(sock, dptr, dsize, 0, (struct sockaddr *)&addr, sizeof(addr));
+	if (ret == -1) {
+		perror("#### error sendto()");
+	} else {
+		DBGPR ("send udp packet retcode=%ldbyte\n", ret);
+	}
+	return ret;
 }
 
 // =====================================================================================
@@ -94,7 +107,7 @@ void *cc_udprecv::thread_func(void *arg)
 	struct timeval timeout;
 	cc_udprecv *urecvp = (cc_udprecv*)arg;
 	fd_set	rfds;
-	int rcvsize;
+	ssize_t ret;
 	
 	while (urecvp->threadloop) {
         // タイムアウト値の設定
@@ -109,16 +122,17 @@ void *cc_udprecv::thread_func(void *arg)
 		select(FD_SETSIZE, &rfds, 0, 0, &timeout);		// wait
 
 		if( FD_ISSET(urecvp->fifo, &rfds) ) {
-			DBGPR ("recv fifo\n");
+			DBGPR ("recv fifo event\n");
 		}
 		if (urecvp->sock != -1) {
 			if( FD_ISSET(urecvp->sock, &rfds) ) {
-				//DBGPR ("recv sock\n");
-				rcvsize = recvfrom (urecvp->sock, urecvp->buffer, urecvp->buffersize, 0, NULL, NULL);
-				//if(numrcv == -1) { status = close(recvSocket); break; }
-				//printf("received: %s\n", buffer);
-
-				urecvp->datarecv (rcvsize);
+				
+				if ((ret = recvfrom (urecvp->sock, urecvp->buffer, urecvp->buffersize, 0, NULL, NULL)) == -1) {
+					perror("#### error recvfrom()");
+				} else {
+					DBGPR ("recv udp packet   retcode=%ldbyte\n", ret);
+				}
+				urecvp->datarecv (ret);
 			}
 		}
 	}
@@ -134,8 +148,11 @@ cc_udprecv::cc_udprecv (void)
 
 	DBGPR ("called()\n");
 
+	// initialize
 	buffer = NULL;
 	sock = -1;
+	fifo = -1;
+	disconnect ();
 
 	// create fifo
  	msgQId = msgget( IPC_PRIVATE , 0666 | IPC_CREAT );
@@ -177,47 +194,44 @@ cc_udprecv::~cc_udprecv ()
 bool
 cc_udprecv::connect (unsigned int port, in_addr_t ipaddr, int bsize)
 {
-	DBGPR ("called()\n");
-
 	// 接続済みなら切断
 	disconnect ();
 
 	// create buffer
 	if ((buffer = (unsigned char*)malloc (bsize)) == NULL) {
-		perror("buffer malloc error");
+		perror("#### error malloc()");
 		return false;
 	}
 	buffersize = bsize;
 	
-	// address
-	memset(&addr, 0, sizeof(addr));
-	addr.sin_port = htons(port);
-	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
 	// create socket
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-		ERRPR ("error socket()\n");
+		perror("#### error socket()");
 		disconnect ();
 		return false;
 	}
 	
+	// address
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	addr.sin_addr.s_addr = ipaddr;
+
 	// bind
 	if (bind(sock, (const struct sockaddr *) &addr, sizeof(addr)) == -1) {
-		ERRPR ("error bind()\n");
+		perror("#### error bind()");
 		disconnect ();
 		return false;
 	}
 	
 	connected = true;
+	DBGPR ("udprecv connected\n");
 	return true;
 }
 
 bool
 cc_udprecv::disconnect (void)
 {
-	DBGPR ("called()\n");
-
 	// disconnect
 	if (sock != -1) {
 		close (sock);
@@ -228,6 +242,7 @@ cc_udprecv::disconnect (void)
 		buffer = NULL;
 	}
 	connected = false;
+	DBGPR ("udprecv disconnected\n");
 	return true;
 }
 
@@ -238,17 +253,13 @@ cc_udprecv::getstatus (void)
 }
 
 void
-cc_udprecv::datarecv (int rcvsize)
+cc_udprecv::datarecv (ssize_t rcvsize)
 {
 	// test code
 	if (rcvsize > 0) {
 		//printf ("#### recv data [%s] %dbyte\n", buffer, rcvsize);
-		printf ("#### recv data %dbyte\n", rcvsize);
+		DBGPR ("#### recv data %ldbyte\n", rcvsize);
 	} else {
-		printf ("#### connection closed\n");
+		DBGPR ("#### connection closed\n");
 	}
 }
-
-
-
-	

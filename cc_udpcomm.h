@@ -32,11 +32,11 @@ public:
 	cc_udpsend (void);
 	virtual ~cc_udpsend ();		// 継承用なのでvirtual
 
-	bool connect (unsigned int port, in_addr_t ipaddr);
+	bool connect (unsigned int port, in_addr_t ipaddr, bool bcast=false);
 	bool disconnect (void);
 	bool getstatus (void);
 	
-	bool send (unsigned char *dptr, int dsize);
+	ssize_t send (unsigned char *dptr, int dsize);
 };
 
 class cc_udprecv {
@@ -61,7 +61,7 @@ public:
 	virtual bool disconnect (void);
 	virtual bool getstatus (void);
 	
-	virtual void datarecv (int rcvsize);
+	virtual void datarecv (ssize_t rcvsize); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
 };
 
 #endif// __CC_UDPCOMM_H__
