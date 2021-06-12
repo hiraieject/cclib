@@ -61,7 +61,7 @@ public:
 	virtual bool disconnect (void);
 	virtual bool getstatus (void);
 	
-	virtual void datarecv (ssize_t rcvsize); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
+	virtual void datarecv (ssize_t rcvsize, struct sockaddr_in from); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
 };
 
 #endif// __CC_UDPCOMM_H__

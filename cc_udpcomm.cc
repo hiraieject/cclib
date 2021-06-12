@@ -1,6 +1,6 @@
 #include "cc_udpcomm.h"
 
-#define UDPCOMM_DBGPR
+//#define UDPCOMM_DBGPR
 
 #if !defined(UDPCOMM_DBGPR) || !defined(__linux)
 #undef DBGPR
@@ -108,6 +108,10 @@ void *cc_udprecv::thread_func(void *arg)
 	cc_udprecv *urecvp = (cc_udprecv*)arg;
 	fd_set	rfds;
 	ssize_t ret;
+
+	struct sockaddr_in from;
+	//int sockaddr_in_size = sizeof(struct sockaddr_in);
+	socklen_t sockaddr_in_size = (socklen_t)sizeof(struct sockaddr_in);
 	
 	while (urecvp->threadloop) {
         // タイムアウト値の設定
@@ -127,12 +131,12 @@ void *cc_udprecv::thread_func(void *arg)
 		if (urecvp->sock != -1) {
 			if( FD_ISSET(urecvp->sock, &rfds) ) {
 				
-				if ((ret = recvfrom (urecvp->sock, urecvp->buffer, urecvp->buffersize, 0, NULL, NULL)) == -1) {
+				if ((ret = recvfrom (urecvp->sock, urecvp->buffer, urecvp->buffersize, 0, (struct sockaddr *)&from, &sockaddr_in_size)) == -1) {
 					perror("#### error recvfrom()");
 				} else {
 					DBGPR ("recv udp packet   retcode=%ldbyte\n", ret);
 				}
-				urecvp->datarecv (ret);
+				urecvp->datarecv (ret, from);
 			}
 		}
 	}
@@ -253,7 +257,7 @@ cc_udprecv::getstatus (void)
 }
 
 void
-cc_udprecv::datarecv (ssize_t rcvsize)
+cc_udprecv::datarecv (ssize_t rcvsize, struct sockaddr_in from)
 {
 	// test code
 	if (rcvsize > 0) {
