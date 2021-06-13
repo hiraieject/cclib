@@ -1,12 +1,16 @@
 
 TARGET   = yos_code_template
 CSRCS    = 
-CCSRCS   = main.cc cc_udpcomm.cc
+CCSRCS   = main.cc cc_udpcomm.cc cc_thread.cc
 LIBS     = -lpthread
 
 CFLAGS  += -g -MD
 CFLAGS  += -Wall
 CFLAGS  += -Werror
+
+CFLAGS  += -DCC_UDPCOMM_DBGPR
+CFLAGS  += -DCC_THREAD_DBGPR
+CFLAGS  += -DCC_FIFO_DBGPR
 
 OBJDIR   = objs
 OBJS     = $(addprefix $(OBJDIR)/, $(CCSRCS:.cc=.o)) $(addprefix $(OBJDIR)/, $(CSRCS:.c=.o))

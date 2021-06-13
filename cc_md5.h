@@ -1,7 +1,7 @@
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
 
 /*
- * MD5 lib for C++  by Yoshikazu Hirai
+ * MD5 class for C++  by hirai
  */
 
 #ifndef __CC_MD5_H__
