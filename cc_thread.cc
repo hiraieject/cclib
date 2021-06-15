@@ -1,27 +1,5 @@
 #include "cc_thread.h"
 
-//#define CC_THREAD_DBGPR
-
-#if !defined(CC_THREAD_DBGPR) || !defined(__linux)
-#undef CC_THREAD_DBGPR
-#undef CC_THREAD_ERRPR
-#undef CC_THREAD_WARNPR
-#define CC_THREAD_DBGPR(fmt, args...)
-#define CC_THREAD_ERRPR(fmt, args...)
-#define CC_THREAD_WARNPR(fmt, args...)
-
-#else 
-#undef CC_THREAD_DBGPR
-#undef CC_THREAD_ERRPR
-#undef CC_THREAD_WARNPR
-#define CC_THREAD_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
-#define CC_THREAD_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#define CC_THREAD_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#endif
-
 // =====================================================================================
 // ===================================================================================== THREAD
 // =====================================================================================

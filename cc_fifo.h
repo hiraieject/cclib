@@ -23,26 +23,19 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//#define CC_FIFO_DBGPR
-
-#if !defined(CC_FIFO_DBGPR) || !defined(__linux)
 #undef CC_FIFO_DBGPR
 #undef CC_FIFO_ERRPR
 #undef CC_FIFO_WARNPR
-#define CC_FIFO_DBGPR(fmt, args...)
-#define CC_FIFO_ERRPR(fmt, args...)
-#define CC_FIFO_WARNPR(fmt, args...)
-
-#else 
-#undef CC_FIFO_DBGPR
-#undef CC_FIFO_ERRPR
-#undef CC_FIFO_WARNPR
-#define CC_FIFO_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
 #define CC_FIFO_ERRPR(fmt, args...) \
 	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
 #define CC_FIFO_WARNPR(fmt, args...)											\
 	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+
+#if !defined(CC_FIFO_ENB_DBGPR)
+#define CC_FIFO_DBGPR(fmt, args...)
+#else 
+#define CC_FIFO_DBGPR(fmt, args...)	\
+	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
 #endif
 
 ///

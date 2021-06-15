@@ -9,6 +9,8 @@ int main(int argc, char *argv[])
 {
 	unsigned char *textp;
 	int textsz;
+	struct in_addr in;
+	struct ifreq ifr;
 
 	printf ("--------\n");
 	
@@ -18,10 +20,23 @@ int main(int argc, char *argv[])
 	cc_udpsend *usendp3 = new cc_udpsend (); // ポートが違うと受信できない
 
 	urecvp1->connect (TESTPORT, INADDR_ANY);
+	urecvp1->get_ifinfo (ifr);
+	printf ("## recv1 %s:%s:%s",
+			inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr),
+			inet_ntoa(((struct sockaddr_in *)&ifr.ifr_broadaddr)->sin_addr),
+			inet_ntoa(((struct sockaddr_in *)&ifr.ifr_netmask)->sin_addr));
 	
 	usendp1->connect (TESTPORT, INADDR_ANY);
+	usendp1->get_ip (in);
+	printf ("## origin ip %s-%s\n" , "eth0" , inet_ntoa(in));
+
 	usendp2->connect (TESTPORT+1, INADDR_ANY);
+	usendp2->get_ip (in);
+	printf ("## origin ip %s-%s\n" , "eth0" , inet_ntoa(in));
+
 	usendp3->connect (TESTPORT+2, INADDR_ANY); // ポートが違うと受信できない
+	usendp3->get_ip (in);
+	printf ("## origin ip %s-%s\n" , "eth0" , inet_ntoa(in));
 
 	printf ("--------\n");
 	

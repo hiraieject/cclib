@@ -8,9 +8,9 @@ CFLAGS  += -g -MD
 CFLAGS  += -Wall
 CFLAGS  += -Werror
 
-CFLAGS  += -DCC_UDPCOMM_DBGPR
-CFLAGS  += -DCC_THREAD_DBGPR
-CFLAGS  += -DCC_FIFO_DBGPR
+CFLAGS  += -DCC_UDPCOMM_ENB_DBGPR
+CFLAGS  += -DCC_THREAD_ENB_DBGPR
+CFLAGS  += -DCC_FIFO_ENB_DBGPR
 
 OBJDIR   = objs
 OBJS     = $(addprefix $(OBJDIR)/, $(CCSRCS:.cc=.o)) $(addprefix $(OBJDIR)/, $(CSRCS:.c=.o))

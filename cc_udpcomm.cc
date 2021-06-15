@@ -1,28 +1,5 @@
 #include "cc_udpcomm.h"
 
-//#define CC_UDPCOMM_DBGPR
-
-#if !defined(CC_UDPCOMM_DBGPR) || !defined(__linux)
-#undef CC_UDPCOMM_DBGPR
-#undef CC_UDPCOMM_ERRPR
-#undef CC_UDPCOMM_WARNPR
-#define CC_UDPCOMM_DBGPR(fmt, args...)
-#define CC_UDPCOMM_ERRPR(fmt, args...)
-#define CC_UDPCOMM_WARNPR(fmt, args...)
-
-#else 
-#undef CC_UDPCOMM_DBGPR
-#undef CC_UDPCOMM_ERRPR
-#undef CC_UDPCOMM_WARNPR
-#define CC_UDPCOMM_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
-#define CC_UDPCOMM_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#define CC_UDPCOMM_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#endif
-
-
 // =====================================================================================
 // ===================================================================================== SEND
 // =====================================================================================
@@ -50,26 +27,25 @@ cc_udpsend::connect (unsigned int port, in_addr_t ipaddr, bool bcast)
 
 	// create socket
 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-		CC_UDPCOMM_DBGPR ("error socket()\n");
+		perror ("cc_udpsend: socket() returned error\n");
 		return false;
 	}
 	// set broadcast flag
 	if (bcast) {
 		int yes = 1;
-		setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&yes, sizeof(yes));
+		if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, (char *)&yes, sizeof(yes)) == -1) {
+			perror("cc_udpsend: setsockopt() returned error");
+			disconnect ();
+			return false;
+		}
+		CC_UDPCOMM_DBGPR ("cc_udpsend: BROADCAST FLAG SET\n");
  	}
-	// get IPv4 IP address
-	{
-		struct in_addr in;
-		get_myip (in);
-		printf ("cc_udpsend: myip %s-%s\n" , "eth0" , inet_ntoa(in));
-	}
-	
 	// address
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = ipaddr;
+	//CC_UDPCOMM_DBGPR ("cc_udpsend: ADDR = %s:%d\n", ipaddr, port);
 
 	// connect success
 	connected = true;
@@ -93,14 +69,18 @@ cc_udpsend::get_status (void) {
 	return connected;
 }
 void
-cc_udpsend::get_myip (struct in_addr &in) {
+cc_udpsend::get_ip (struct in_addr &in) {
 	struct ifreq ifr;
-	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , "eth0" , 30);
-	ioctl(sock, SIOCGIFADDR, &ifr);
+	get_ifinfo (ifr);
 	in = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
 	//printf ("myip %s-%s\n" , "eth0" , inet_ntoa(in));
 }
+void cc_udpsend::get_ifinfo (struct ifreq &ifr) {
+	ifr.ifr_addr.sa_family = AF_INET;
+	strncpy(ifr.ifr_name , "eth0" , 30);
+	ioctl(sock, SIOCGIFADDR, &ifr);
+}
+	
 
 ssize_t
 cc_udpsend::send (unsigned char *dptr, int dsize)
@@ -109,7 +89,7 @@ cc_udpsend::send (unsigned char *dptr, int dsize)
 	if (ret == -1) {
 		perror("#### error sendto()");
 	} else {
-		CC_UDPCOMM_DBGPR ("cc_udpsend: send udp packet retcode=%ldbyte\n", ret);
+		CC_UDPCOMM_DBGPR ("cc_udpsend: send udp packet retcode=%ldbyte\n", (unsigned long)ret);
 	}
 	return ret;
 }
@@ -153,7 +133,7 @@ cc_udprecv::thread_func(void *arg)
 				if ((ret = recvfrom (myobj->sock, myobj->buffer, myobj->buffersize, 0, (struct sockaddr *)&from, &sockaddr_in_size)) == -1) {
 					perror("#### error recvfrom()");
 				} else {
-					CC_UDPCOMM_DBGPR ("cc_udpsend: recv udp packet   retcode=%ldbyte\n", ret);
+					CC_UDPCOMM_DBGPR ("cc_udpsend: recv udp packet   retcode=%ldbyte\n", (unsigned long)ret);
 				}
 				myobj->datarecv (ret, from);
 			}
@@ -204,18 +184,12 @@ cc_udprecv::connect (unsigned int port, in_addr_t ipaddr, int bsize)
 		return false;
 	}
 	
-	// get IPv4 IP address
-	{
-		struct in_addr in;
-		get_myip (in);
-		printf ("cc_udprecv: myip %s-%s\n" , "eth0" , inet_ntoa(in));
-	}
-	
 	// address
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	addr.sin_addr.s_addr = ipaddr;
+	//CC_UDPCOMM_DBGPR ("cc_udprecv: ADDR = %s:%d\n", ipaddr, port);
 
 	// bind
 	if (bind(sock, (const struct sockaddr *) &addr, sizeof(addr)) == -1) {
@@ -254,13 +228,16 @@ cc_udprecv::get_status (void)
 	return connected;
 }
 void
-cc_udprecv::get_myip (struct in_addr &in) {
+cc_udprecv::get_ip (struct in_addr &in) {
 	struct ifreq ifr;
-	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , "eth0" , 30);
-	ioctl(sock, SIOCGIFADDR, &ifr);
+	get_ifinfo (ifr);
 	in = ((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr;
 	//printf ("myip %s-%s\n" , "eth0" , inet_ntoa(in));
+}
+void cc_udprecv::get_ifinfo (struct ifreq &ifr) {
+	ifr.ifr_addr.sa_family = AF_INET;
+	strncpy(ifr.ifr_name , "eth3" , 30);
+	ioctl(sock, SIOCGIFADDR, &ifr);
 }
 
 void
@@ -269,7 +246,7 @@ cc_udprecv::datarecv (ssize_t rcvsize, struct sockaddr_in from)
 	// test code
 	if (rcvsize > 0) {
 		//printf ("#### recv data [%s] %dbyte\n", buffer, rcvsize);
-		CC_UDPCOMM_DBGPR ("cc_udprecv: recv data %ldbyte from %s:%d\n", rcvsize, inet_ntoa(from.sin_addr), ntohs(from.sin_port));
+		CC_UDPCOMM_DBGPR ("cc_udprecv: recv data %ldbyte from %s:%d\n", (unsigned long)rcvsize, inet_ntoa(from.sin_addr), ntohs(from.sin_port));
 	} else {
 		CC_UDPCOMM_DBGPR ("cc_udprecv: connection closed\n");
 	}

@@ -27,6 +27,21 @@
 
 #include "cc_thread.h"
 
+#undef CC_UDPCOMM_DBGPR
+#undef CC_UDPCOMM_ERRPR
+#undef CC_UDPCOMM_WARNPR
+#define CC_UDPCOMM_ERRPR(fmt, args...) \
+	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+#define CC_UDPCOMM_WARNPR(fmt, args...)											\
+	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+
+#if !defined(CC_UDPCOMM_ENB_DBGPR)
+#define CC_UDPCOMM_DBGPR(fmt, args...)
+#else 
+#define CC_UDPCOMM_DBGPR(fmt, args...)	\
+	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
+#endif
+
 ///
 /// ■■■■■　UDP 送信クラス
 ///
@@ -42,8 +57,12 @@ public:
 	bool connect (unsigned int port, in_addr_t ipaddr, bool bcast=false);
 	bool disconnect (void);
 	bool get_status (void);
-	void get_myip (struct in_addr &in);
-	
+	void get_ip (struct in_addr &in);
+	void get_ifinfo (struct ifreq &ifr);	// inet_ntoa((&(ifr.ifr_addr))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
+
 	ssize_t send (unsigned char *dptr, int dsize);
 };
 
@@ -67,8 +86,12 @@ public:
 	bool connect (unsigned int port, in_addr_t ipaddr, int bsize=1024);
 	bool disconnect (void);
 	bool get_status (void);
-	void get_myip (struct in_addr &in);
-	
+	void get_ip (struct in_addr &in);
+	void get_ifinfo (struct ifreq &ifr);	// inet_ntoa((&(ifr.ifr_addr))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
+											// inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
+
 	virtual void datarecv (ssize_t rcvsize, struct sockaddr_in from); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
 };
 

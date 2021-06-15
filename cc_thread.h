@@ -26,6 +26,21 @@
 
 #include "cc_fifo.h"
 
+#undef CC_THREAD_DBGPR
+#undef CC_THREAD_ERRPR
+#undef CC_THREAD_WARNPR
+#define CC_THREAD_ERRPR(fmt, args...) \
+	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+#define CC_THREAD_WARNPR(fmt, args...)											\
+	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+
+#if !defined(CC_THREAD_ENB_DBGPR)
+#define CC_THREAD_DBGPR(fmt, args...)
+#else 
+#define CC_THREAD_DBGPR(fmt, args...)	\
+	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
+#endif
+
 ///
 /// ■■■■■　thread 制御クラス
 ///
