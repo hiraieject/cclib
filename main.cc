@@ -1,5 +1,6 @@
 #include "cc_udpcomm.h"
 #include "cc_md5.h"
+#include "cc_mutex.h"
 
 #include "yostemplate.h"
 
