@@ -1,0 +1,9 @@
+
+#include <stdio.h>
+#include <stdbool.h>
+
+#define __CLIST_C__
+#define __CLIST_TEST_C__
+#define __CLIST_TEST_CHECK_ENB
+#define C_LIST_ENB_DBGPR
+#include "c_list.h"

@@ -1,22 +1,32 @@
 
 TARGET   = yos_code_template
-CSRCS    = 
+CSRCS    = cmain.c
 CCSRCS   = main.cc cc_udpcomm.cc cc_thread.cc
 LIBS     = -lpthread
+
+CPPFLAGS  += -g -MD
+CPPFLAGS  += -Wall
+CPPFLAGS  += -Werror
+
+CPPFLAGS  += -DCC_UDPCOMM_ENB_DBGPR
+CPPFLAGS  += -DCC_THREAD_ENB_DBGPR
+CPPFLAGS  += -DCC_FIFO_ENB_DBGPR
 
 CFLAGS  += -g -MD
 CFLAGS  += -Wall
 CFLAGS  += -Werror
 
-CFLAGS  += -DCC_UDPCOMM_ENB_DBGPR
-CFLAGS  += -DCC_THREAD_ENB_DBGPR
-CFLAGS  += -DCC_FIFO_ENB_DBGPR
+CPPOBJDIR   = objs_cpp
+CPPOBJS     = $(addprefix $(CPPOBJDIR)/, $(CCSRCS:.cc=.o))
 
-OBJDIR   = objs
-OBJS     = $(addprefix $(OBJDIR)/, $(CCSRCS:.cc=.o)) $(addprefix $(OBJDIR)/, $(CSRCS:.c=.o))
+COBJDIR   = objs_c
+COBJS     = $(addprefix $(COBJDIR)/, $(CSRCS:.c=.o))
 
 CPP       = g++
-CFLAGS   += -std=gnu++11
+CPPFLAGS   += -std=gnu++11
+
+CC       = g++
+#CFLAGS   += -std=c99
 
 
 .PHONY: all clean kill test archive server client objdir diff
@@ -25,21 +35,25 @@ all: objdir $(TARGET)
 	make gtags
 
 objdir:
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(CPPOBJDIR) $(COBJDIR)
 
-$(TARGET): $(OBJS)
-	$(CPP) -o $(TARGET) $(OBJS) $(LDFLAGS) $(LIBS)
+$(TARGET): $(COBJS) $(CPPOBJS)
+	$(CPP) -o $(TARGET) $(COBJS) $(CPPOBJS) $(LDFLAGS) $(LIBS)
 
 	@echo -n '### source code total line count = '
 #	@cat *.c *.cc *.h | wc -l
 	@cat *.cc *.h | wc -l
 	@echo ------------------------------------------------------------
 
-$(OBJS): Makefile
+$(COBJS) $(CPPOBJS): Makefile
 
-$(OBJDIR)/%.o: %.cc
-	@[ -d $(OBJDIR) ]
-	$(CPP) -o $@ -c $< $(CFLAGS)
+$(CPPOBJDIR)/%.o: %.cc
+	@[ -d $(CPPOBJDIR) ]
+	$(CPP) -o $@ -c $< $(CPPFLAGS)
+
+$(COBJDIR)/%.o: %.c
+	@[ -d $(COBJDIR) ]
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
 	rm -rf $(OBJDIR) $(TARGET)
@@ -54,4 +68,10 @@ clean_gtags:
 
 test:
 	gdb $(TARGET)
+
+run:
+	./$(TARGET)
+
+-include $(COBJDIR)/*.d
+-include $(CPPOBJDIR)/*.d
 

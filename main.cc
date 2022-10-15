@@ -4,6 +4,8 @@
 
 #include "yostemplate.h"
 
+#include "c_list.h"
+
 #define TESTPORT 11000
 
 int main(int argc, char *argv[])
@@ -72,6 +74,10 @@ int main(int argc, char *argv[])
 	delete usendp2;
 	delete usendp3;
 	delete urecvp1;
+
+	printf ("--------\n");
+
+	clist_test_main();
 
 	printf ("--------\n");
 	

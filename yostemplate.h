@@ -1,3 +1,4 @@
+
 /* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
 
 #ifndef __YOSTEMPLATE_H__
