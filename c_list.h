@@ -645,26 +645,23 @@ void clist_test_main(void)
 		printf ("-------- \n");
 		{
 			CLIST_REFERER *crefp = clist_referer_create (clistp);
+			CLIST_TEST_DATA *datap;
 
-			printf ("-------- loop LIST (dump regular order)\n");
-			crefp->data_begin(crefp);
-			while (crefp->current) {
-				CLIST_CONTAINER *ccp = crefp->current;
-				void *datap = ccp->datap;
-				CLIST_TEST_DATA *testdatap = (CLIST_TEST_DATA *)datap;
-				printf (" n = %d\n", testdatap->n);
-				crefp->data_next(crefp);
+			// FORWARD LOOP
+			printf ("-------- loop LIST (FORWARD LOOP)\n");
+			datap = (CLIST_TEST_DATA *)crefp->data_begin(crefp);
+			while (datap) {
+				printf (" n = %d\n", datap->n);
+				datap = (CLIST_TEST_DATA *)crefp->data_next(crefp);
 			}
 			printf ("-------- \n");
 
-			printf ("-------- loop LIST (dump reverse order)\n");
-			crefp->data_end(crefp);
+			// REVERSE LOOP
+			printf ("-------- loop LIST (REVERSE LOOP)\n");
+			datap = (CLIST_TEST_DATA *)crefp->data_end(crefp);
 			while (crefp->current) {
-				CLIST_CONTAINER *ccp = crefp->current;
-				void *datap = ccp->datap;
-				CLIST_TEST_DATA *testdatap = (CLIST_TEST_DATA *)datap;
-				printf (" n = %d\n", testdatap->n);
-				crefp->data_prev(crefp);
+				printf (" n = %d\n", datap->n);
+				datap = (CLIST_TEST_DATA *)crefp->data_prev(crefp);
 			}
 			printf ("-------- \n");
 
