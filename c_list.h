@@ -149,8 +149,8 @@ typedef struct _CLIST_DATAUTY {
 typedef struct _CLIST_CONTAINER {
 
 	// public
-	struct _CLIST_CONTAINER *nextp;											//!< 双方向リストの後方リンク
-	struct _CLIST_CONTAINER *prevp;											//!< 双方向リストの前方リンク
+	struct _CLIST_CONTAINER *nextp;											//!< 双方向リストの前方リンク
+	struct _CLIST_CONTAINER *prevp;											//!< 双方向リストの後方リンク
 	void *datap;															//!< ユーザーデータのポインタ
 
 } CLIST_CONTAINER;
@@ -267,9 +267,10 @@ typedef struct _CLIST {
 
 } CLIST;
 
+// ------------------------------------------------------------------------------------------
 // public methods extern
 extern CLIST_CONTAINER *_clist_container_create (CLIST *clistp, void *create_param, bool do_add_last);		//!< 新規コンテナ生成関数、オプション指定でリスト終端に追加（CLISTメソッド）
-extern CLIST_RET _clist_container_destroy (CLIST *clistp, CLIST_CONTAINER *containerp);					//!< コンテナ開放関数（対象は指定のコンテナ１つのみ）、（CLISTメソッド）
+extern CLIST_RET _clist_container_destroy (CLIST *clistp, CLIST_CONTAINER *containerp);						//!< コンテナ開放関数（対象は指定のコンテナ１つのみ）、（CLISTメソッド）
 extern CLIST_RET _clist_container_destroy_all (CLIST *clistp);												//!< 全コンテナ開放関数（対象はCLISTが保持するすべて）、（CLISTメソッド）
 
 extern CLIST_RET _clist_container_add_top (CLIST *clistp, CLIST_CONTAINER *containerp);						//!< 指定のコンテナをリスト先頭につなぐ関数、（CLISTメソッド）
@@ -281,6 +282,7 @@ extern CLIST_RET _clist_container_sort (CLIST *clistp);														//!< リス
 extern CLIST_RET _clist_container_dump (CLIST *clistp, CLIST_CONTAINER *containerp);						//!< デバック用、指定のコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
 extern CLIST_RET _clist_dump_all (CLIST *clistp);															//!< デバック用、保持しているすべてのコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
 
+// ------------------------------------------------------------------------------------------
 // utility function
 /**
  * @brief  CLISTを生成する (CLIST　ユーティリティ関数)
@@ -312,8 +314,8 @@ typedef struct _CLIST_REFERER {
 	void *(*data)(struct _CLIST_REFERER *crefp, int idx);					//!< 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	void *(*data_begin)(struct _CLIST_REFERER *crefp);						//!< 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	void *(*data_end)(struct _CLIST_REFERER *crefp);						//!< 参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-	void *(*data_prev)(struct _CLIST_REFERER *crefp);						//!< 参照先を次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-	void *(*data_next)(struct _CLIST_REFERER *crefp);						//!< 参照先を前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+	void *(*data_prev)(struct _CLIST_REFERER *crefp);						//!< 参照先を前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+	void *(*data_next)(struct _CLIST_REFERER *crefp);						//!< 参照先を次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	int (*count)(struct _CLIST_REFERER *crefp);								//!< コンテナの総数を返す関数、（CLISTリファラメソッド）
 
 	void *(*data_current)(struct _CLIST_REFERER *crefp);					//!< 参照先は移動せず、現在位置のユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
@@ -321,8 +323,8 @@ typedef struct _CLIST_REFERER {
 	void *(*data_find)(struct _CLIST_REFERER *crefp, int idx, void *key);	//!< 指定したキー条件で、参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	void *(*data_find_begin)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	void *(*data_find_end)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-	void *(*data_find_prev)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-	void *(*data_find_next)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+	void *(*data_find_prev)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+	void *(*data_find_next)(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 	int (*find_count)(struct _CLIST_REFERER *crefp, void *key);				//!< 指定したキー条件で、コンテナの総数を返す関数、（CLISTリファラメソッド）
 
 //contains	指定したキーの要素が含まれているかを判定する	C++20
@@ -330,23 +332,25 @@ typedef struct _CLIST_REFERER {
 
 } CLIST_REFERER;
 
+// ------------------------------------------------------------------------------------------
 // public methods extern
-extern void *_clist_referer_data(struct _CLIST_REFERER *crefp, int idx);					//!< 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_begin(struct _CLIST_REFERER *crefp);						//!< 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_end(struct _CLIST_REFERER *crefp);							//!< 参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_prev(struct _CLIST_REFERER *crefp);						//!< 参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_next(struct _CLIST_REFERER *crefp);						//!< 参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern int _clist_referer_count(struct _CLIST_REFERER *crefp);								//!< コンテナの総数を返す関数、（CLISTリファラメソッド）
+extern void *_clist_referer_data(struct _CLIST_REFERER *crefp, int idx);					//!< 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_begin(struct _CLIST_REFERER *crefp);						//!< 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_end(struct _CLIST_REFERER *crefp);							//!< 参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_prev(struct _CLIST_REFERER *crefp);						//!< 参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_next(struct _CLIST_REFERER *crefp);						//!< 参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern int _clist_referer_count(struct _CLIST_REFERER *crefp);								//!< コンテナの総数を返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
 
-extern void *_clist_referer_data_current(struct _CLIST_REFERER *crefp);						//!< 現在の参照先のユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+extern void *_clist_referer_data_current(struct _CLIST_REFERER *crefp);						//!< 現在の参照先のユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
 
-extern void *_clist_referer_data_find(struct _CLIST_REFERER *crefp, int idx, void *key);	//!< 指定したキー条件で、参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_find_begin(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_find_end(struct _CLIST_REFERER *crefp, void *key);			//!< 指定したキー条件で、参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_find_prev(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern void *_clist_referer_data_find_next(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
-extern int _clist_referer_find_count(struct _CLIST_REFERER *crefp, void *key);				//!< 指定したキー条件で、コンテナの総数を返す関数、（CLISTリファラメソッド）
+extern void *_clist_referer_data_find(struct _CLIST_REFERER *crefp, int idx, void *key);	//!< 指定したキー条件で、参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_find_begin(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_find_end(struct _CLIST_REFERER *crefp, void *key);			//!< 指定したキー条件で、参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_find_prev(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern void *_clist_referer_data_find_next(struct _CLIST_REFERER *crefp, void *key);		//!< 指定したキー条件で、参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
+extern int _clist_referer_find_count(struct _CLIST_REFERER *crefp, void *key);				//!< 指定したキー条件で、コンテナの総数を返す関数、（CLISTリファラメソッド、必ずCLIST_REFERER経由で呼び出す）
 
+// ------------------------------------------------------------------------------------------
 // utility function
 /**
  * @brief  CLISTリファラーを生成する (CLISTリファラー　ユーティリティ関数)
@@ -367,7 +371,11 @@ extern CLIST_RET clist_referer_destroy (struct _CLIST_REFERER *crefp);
 
 // ============================================================================================ CLIST_CONTAINER (CLISTコンテナ構造体)　　関数群
 
+// ------------------------------------------------------------------------------------------
 // utility function
+
+// ------------------------------------------------------------------------------------------
+// CLISTコンテナを生成(malloc)する (CLISTコンテナ　ユーティリティ関数)
 struct _CLIST_CONTAINER *clist_container_create (CLIST_DATAUTY *dutyp, void *create_param)
 {
 	if (dutyp == NULL || dutyp->create == NULL) {
@@ -389,6 +397,9 @@ struct _CLIST_CONTAINER *clist_container_create (CLIST_DATAUTY *dutyp, void *cre
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (NULL);
 }
+
+// ------------------------------------------------------------------------------------------
+// CLISTコンテナを開放(free)する (CLISTコンテナ　ユーティリティ関数)
 void clist_container_destroy (struct _CLIST_CONTAINER *containerp, CLIST_DATAUTY *dutyp)
 {
 	if (containerp == NULL || dutyp == NULL || dutyp->destroy == NULL) {
@@ -403,9 +414,11 @@ void clist_container_destroy (struct _CLIST_CONTAINER *containerp, CLIST_DATAUTY
 
 // ============================================================================================ CLIST 構造体　　関数群
 
+// ------------------------------------------------------------------------------------------
 // public methods extern
 
-/// 新規コンテナ生成関数、オプション指定でリスト終端に追加（CLISTメソッド）
+// ------------------------------------------------------------------------------------------
+// 新規コンテナ生成関数、オプション指定でリスト終端に追加（CLISTメソッド）
 CLIST_CONTAINER *_clist_container_create (CLIST *clistp, void *create_param, bool do_add_last)
 {
 	if (clistp == NULL) {
@@ -419,7 +432,9 @@ CLIST_CONTAINER *_clist_container_create (CLIST *clistp, void *create_param, boo
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return containerp;
 }
-/// コンテナ開放関数（対象は指定のコンテナ１つのみ）、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// コンテナ開放関数（対象は指定のコンテナ１つのみ）、（CLISTメソッド）
 CLIST_RET _clist_container_destroy (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	if (clistp == NULL) {
@@ -432,7 +447,9 @@ CLIST_RET _clist_container_destroy (CLIST *clistp, CLIST_CONTAINER *containerp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 全コンテナ開放関数（対象はCLISTが保持するすべて）、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 全コンテナ開放関数（対象はCLISTが保持するすべて）、（CLISTメソッド）
 CLIST_RET _clist_container_destroy_all (CLIST *clistp)
 {
 	if (clistp == NULL) {
@@ -449,7 +466,9 @@ CLIST_RET _clist_container_destroy_all (CLIST *clistp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 指定のコンテナをリスト先頭につなぐ関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定のコンテナをリスト先頭につなぐ関数、（CLISTメソッド）
 CLIST_RET _clist_container_add_top (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	if (clistp == NULL || containerp == NULL) {
@@ -481,7 +500,9 @@ CLIST_RET _clist_container_add_top (CLIST *clistp, CLIST_CONTAINER *containerp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 指定のコンテナをリスト終端につなぐ関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定のコンテナをリスト終端につなぐ関数、（CLISTメソッド）
 CLIST_RET _clist_container_add_last (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	if (clistp == NULL || containerp == NULL) {
@@ -513,7 +534,9 @@ CLIST_RET _clist_container_add_last (CLIST *clistp, CLIST_CONTAINER *containerp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 指定のコンテナをリストから外す関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定のコンテナをリストから外す関数、（CLISTメソッド）
 CLIST_RET _clist_container_remove (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	if (clistp == NULL) {
@@ -542,25 +565,33 @@ CLIST_RET _clist_container_remove (CLIST *clistp, CLIST_CONTAINER *containerp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 指定のコンテナをリスト前方に１つ移動する関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定のコンテナをリスト前方に１つ移動する関数、（CLISTメソッド）
 CLIST_RET _clist_container_up (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// 指定のコンテナをリスト後方に１つ移動する関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定のコンテナをリスト後方に１つ移動する関数、（CLISTメソッド）
 CLIST_RET _clist_container_down (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// リストをソートする関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// リストをソートする関数、（CLISTメソッド）
 CLIST_RET _clist_container_sort (CLIST *clistp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// デバック用、指定のコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// デバック用、指定のコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
 CLIST_RET _clist_container_dump (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
 	if (clistp != NULL && clistp->dutyp != NULL && clistp->dutyp->dump != NULL) {
@@ -569,7 +600,9 @@ CLIST_RET _clist_container_dump (CLIST *clistp, CLIST_CONTAINER *containerp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return CLIST_RET_OK;
 }
-/// デバック用、保持しているすべてのコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
+
+// ------------------------------------------------------------------------------------------
+// デバック用、保持しているすべてのコンテナを見やすい形で表示(dump)する関数、（CLISTメソッド）
 CLIST_RET _clist_dump_all (CLIST *clistp)
 {
 	if (clistp == NULL) {
@@ -585,8 +618,10 @@ CLIST_RET _clist_dump_all (CLIST *clistp)
 	return CLIST_RET_OK;
 }
 
+// ------------------------------------------------------------------------------------------
 // utility function
 
+// ------------------------------------------------------------------------------------------
 // CLISTを生成する (CLIST　ユーティリティ関数)
 CLIST *clist_create (CLIST_DATAUTY *dutyp)
 {
@@ -618,6 +653,8 @@ CLIST *clist_create (CLIST_DATAUTY *dutyp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return clistp;
 }
+
+// ------------------------------------------------------------------------------------------
 //  CLISTを開放する (CLIST　ユーティリティ関数)
 CLIST_RET clist_destroy (CLIST *clistp)
 {
@@ -634,45 +671,59 @@ CLIST_RET clist_destroy (CLIST *clistp)
 
 // ============================================================================================ CLIST_REFERER (CLISTリファラ構造体)　　関数群
 
+// ------------------------------------------------------------------------------------------
 // public methods
 
-/// 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+// ------------------------------------------------------------------------------------------
+// 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data(CLIST_REFERER *crefp, int idx)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return _clist_referer_data_find(crefp, idx, NULL);
 }
-/// 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_begin(CLIST_REFERER *crefp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return _clist_referer_data_find_begin(crefp, NULL);
 }
+
+// ------------------------------------------------------------------------------------------
 //!< 参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_end(CLIST_REFERER *crefp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return _clist_referer_data_find_end(crefp, NULL);
 }
-/// 参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_prev(CLIST_REFERER *crefp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return _clist_referer_data_find_prev(crefp, NULL);
 }
-/// 参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_next(CLIST_REFERER *crefp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return _clist_referer_data_find_next(crefp, NULL);
 }
-/// 現在の参照先のユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 現在の参照先のユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_current(CLIST_REFERER *crefp)
 {
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// コンテナの総数を返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// コンテナの総数を返す関数、（CLISTリファラメソッド）
 int _clist_referer_count(struct _CLIST_REFERER *crefp)
 {
 	if (crefp == NULL) {
@@ -682,7 +733,9 @@ int _clist_referer_count(struct _CLIST_REFERER *crefp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return crefp->clistp->container_count;
 }
-/// 指定したキー条件で、参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_find(struct _CLIST_REFERER *crefp, int idx, void *key)
 {
 	if (crefp == NULL) {
@@ -708,7 +761,9 @@ void *_clist_referer_data_find(struct _CLIST_REFERER *crefp, int idx, void *key)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// 指定したキー条件で、参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_find_begin(struct _CLIST_REFERER *crefp, void *key)
 {
 	if (crefp == NULL) {
@@ -732,7 +787,9 @@ void *_clist_referer_data_find_begin(struct _CLIST_REFERER *crefp, void *key)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// 指定したキー条件で、参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_find_end(struct _CLIST_REFERER *crefp, void *key)
 {
 	if (crefp == NULL) {
@@ -756,7 +813,9 @@ void *_clist_referer_data_find_end(struct _CLIST_REFERER *crefp, void *key)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// 指定したキー条件で、参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_find_prev(struct _CLIST_REFERER *crefp, void *key)
 {
 	if (crefp == NULL) {
@@ -780,7 +839,9 @@ void *_clist_referer_data_find_prev(struct _CLIST_REFERER *crefp, void *key)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// 指定したキー条件で、参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_find_next(struct _CLIST_REFERER *crefp, void *key)
 {
 	if (crefp == NULL) {
@@ -804,14 +865,20 @@ void *_clist_referer_data_find_next(struct _CLIST_REFERER *crefp, void *key)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
-/// 指定したキー条件で、コンテナの総数を返す関数、（CLISTリファラメソッド）
+
+// ------------------------------------------------------------------------------------------
+// 指定したキー条件で、コンテナの総数を返す関数、（CLISTリファラメソッド）
 int _clist_referer_find_count(struct _CLIST_REFERER *crefp, void *key)
 {
 	// TODO: not impremented
 	return _clist_referer_count(crefp);
 }
 
+// ------------------------------------------------------------------------------------------
 // utility function
+
+// ------------------------------------------------------------------------------------------
+// CLISTリファラーを生成する (CLISTリファラー　ユーティリティ関数)
 CLIST_REFERER *clist_referer_create (CLIST *clistp)
 {
 	if (clistp == NULL) {
@@ -843,6 +910,9 @@ CLIST_REFERER *clist_referer_create (CLIST *clistp)
 	CLIST_TEST_CHECK("1/1");	// MODULE TEST
 	return crefp;
 }
+
+// ------------------------------------------------------------------------------------------
+// CLISTリファラーを開放する (CLISTリファラー　ユーティリティ関数)
 CLIST_RET clist_referer_destroy (struct _CLIST_REFERER *crefp)
 {
 	if (crefp == NULL) {
