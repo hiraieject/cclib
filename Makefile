@@ -85,5 +85,10 @@ doxygen_generate: Doxyfile.txt
 		make doxygen_create_template; \
 	fi
 	doxygen Doxyfile.txt
-doxygen_create_template:
+doxygen_create_doxyfile:
 	doxygen -g Doxyfile.txt
+
+doxygen_check_doxyfile:
+	@doxygen -g Doxyfile_org.txt > /dev/null
+	diff Doxyfile_org.txt Doxyfile.txt
+	rm -f Doxyfile_org.txt
