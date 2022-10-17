@@ -34,7 +34,14 @@ CC       = g++
 .PHONY: all clean kill test archive server client objdir diff
 
 all: objdir $(TARGET)
+	@echo -----------------------------------------------
+	@echo -n '### source code total line count = '
+#	@cat *.c *.cc *.h | wc -l
+	@cat *.c *.cc *.h | wc -l
+	@echo -----------------------------------------------
 	make gtags
+	@echo -----------------------------------------------
+	make doxygen_generate
 
 objdir:
 	@mkdir -p $(CPPOBJDIR) $(COBJDIR)
@@ -42,10 +49,6 @@ objdir:
 $(TARGET): $(COBJS) $(CPPOBJS)
 	$(CPP) -o $(TARGET) $(COBJS) $(CPPOBJS) $(LDFLAGS) $(LIBS)
 
-	@echo -n '### source code total line count = '
-#	@cat *.c *.cc *.h | wc -l
-	@cat *.cc *.h | wc -l
-	@echo ------------------------------------------------------------
 
 $(COBJS) $(CPPOBJS): Makefile
 
@@ -77,3 +80,10 @@ run:
 -include $(COBJDIR)/*.d
 -include $(CPPOBJDIR)/*.d
 
+doxygen_generate: Doxyfile.txt
+	if [ ! -f Doxyfile.txt ] ; then \
+		make doxygen_create_template; \
+	fi
+	doxygen Doxyfile.txt
+doxygen_create_template:
+	doxygen -g Doxyfile.txt
