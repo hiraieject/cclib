@@ -80,15 +80,15 @@ run:
 -include $(COBJDIR)/*.d
 -include $(CPPOBJDIR)/*.d
 
-doxygen_generate: Doxyfile.txt
-	if [ ! -f Doxyfile.txt ] ; then \
+doxygen_generate: Doxyfile
+	if [ ! -f Doxyfile ] ; then \
 		make doxygen_create_template; \
 	fi
-	doxygen Doxyfile.txt
+	doxygen Doxyfile
 doxygen_create_doxyfile:
-	doxygen -g Doxyfile.txt
+	doxygen -g Doxyfile
 
 doxygen_check_doxyfile:
-	@doxygen -g Doxyfile_org.txt > /dev/null
-	diff Doxyfile_org.txt Doxyfile.txt
-	rm -f Doxyfile_org.txt
+	@doxygen -g Doxyfile_org > /dev/null
+	diff Doxyfile_org Doxyfile
+	rm -f Doxyfile_org
