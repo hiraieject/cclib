@@ -1,5 +1,5 @@
 
-TARGET   = yos_code_template
+TARGET   = ycttest
 CSRCS    = cmain.c
 CCSRCS   = main.cc cc_udpcomm.cc cc_thread.cc
 LIBS     = -lpthread
