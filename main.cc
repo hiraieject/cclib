@@ -5,6 +5,7 @@
 #include "yostemplate.h"
 
 #include "c_list.h"
+#include "c_vector.h"
 
 #define TESTPORT 11000
 
@@ -78,6 +79,7 @@ int main(int argc, char *argv[])
 	printf ("--------\n");
 
 	clist_test_main();
+	cvector_test_main();
 
 	printf ("--------\n");
 	

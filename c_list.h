@@ -17,6 +17,8 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+// ============================================================================================ DEBUG/TEST
+
 #if !defined(C_LIST_ENB_DBGPR)
 #define CLIST_DBGPR(fmt, args...)
 #else 
@@ -26,32 +28,32 @@ extern "C" {
 #define CLIST_ERRPR(fmt, args...)	\
 	{ printf("[%s:%s():%d] " fmt "\n", __FILE__,__FUNCTION__,__LINE__,## args); }
 
-#if defined(__CLIST_TEST_CHECK_ENB)
-static FILE *fp = NULL;
-#define CLIST_TEST_CHECK(nn) \
+#if defined(__CLIST_TEST_ASSERT_ENB)
+static FILE *cldbgfp = NULL;
+#define CLIST_TEST_ASSERT(nn,result)	\
 	{ \
 		static bool checked = false; \
-		if (fp == NULL) fp = fopen (".test_result_clist.txt", "w+"); \
+		if (cldbgfp == NULL) cldbgfp = fopen (".test_result_clist.txt", "w+"); \
 		if (checked == false) { \
-			if (fp != NULL) { \
-				fprintf (fp, "%d:  %s() %s\n", __LINE__, __FUNCTION__,nn); \
+			if (cldbgfp != NULL) { \
+				fprintf (cldbgfp, "%d:  %s() %s %s\n", __LINE__, __FUNCTION__,nn,((result) ? "OK" : "NG")); \
 				checked = true; \
 			} \
 		} \
 	}
-#define CLIST_TEST_CHECK_END() \
+#define CLIST_TEST_ASSERT_CLOSE() \
 	{ \
-		if (fp != NULL) { \
-			fclose(fp); \
-			fp = NULL; \
+		if (cldbgfp != NULL) { \
+			fclose(cldbgfp); \
+			cldbgfp = NULL; \
 		} \
-		system ("sort -o test_result_clist.txt .test_result_clist.txt"); \
+		system ("cat .test_result_clist.txt | sort | uniq > test_result_clist.txt"); \
 		system ("rm -f .test_result_clist.txt"); \
 		printf ("##### test result file: test_result_clist.txt created\n"); \
 }
 #else
-#define CLIST_TEST_CHECK(nn)
-#define CLIST_TEST_CHECK_END()
+#define CLIST_TEST_ASSERT(result)
+#define CLIST_TEST_ASSERT_CLOSE()
 #endif
 
 // ============================================================================================ マクロ定義等
@@ -394,7 +396,7 @@ struct _CLIST_CONTAINER *clist_container_create (CLIST_DATAUTY *dutyp, void *cre
 		free (containerp);
 		return NULL;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (NULL);
 }
 
@@ -409,7 +411,7 @@ void clist_container_destroy (struct _CLIST_CONTAINER *containerp, CLIST_DATAUTY
 	dutyp->destroy(containerp->datap);
 	free (containerp);
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 }
 
 // ============================================================================================ CLIST 構造体　　関数群
@@ -429,7 +431,7 @@ CLIST_CONTAINER *_clist_container_create (CLIST *clistp, void *create_param, boo
 	if (containerp != NULL && do_add_last) {
 		clistp->container_add_last (clistp, containerp);
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return containerp;
 }
 
@@ -444,7 +446,7 @@ CLIST_RET _clist_container_destroy (CLIST *clistp, CLIST_CONTAINER *containerp)
 	_clist_container_remove (clistp, containerp);
 	clist_container_destroy (containerp, clistp->dutyp);
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -463,7 +465,7 @@ CLIST_RET _clist_container_destroy_all (CLIST *clistp)
 		clist_container_destroy (ccp, clistp->dutyp);
 		ccp = ccnextp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -497,7 +499,7 @@ CLIST_RET _clist_container_add_top (CLIST *clistp, CLIST_CONTAINER *containerp)
 	clistp->container_count ++;
 	CLIST_DBGPR("_clist_container_add_top: success");
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -531,7 +533,7 @@ CLIST_RET _clist_container_add_last (CLIST *clistp, CLIST_CONTAINER *containerp)
 	clistp->container_count ++;
 	CLIST_DBGPR("_clist_container_add_last: success");
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -562,7 +564,7 @@ CLIST_RET _clist_container_remove (CLIST *clistp, CLIST_CONTAINER *containerp)
 		ccp = ccp->nextp;
 	}
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -570,7 +572,7 @@ CLIST_RET _clist_container_remove (CLIST *clistp, CLIST_CONTAINER *containerp)
 // 指定のコンテナをリスト前方に１つ移動する関数、（CLISTメソッド）
 CLIST_RET _clist_container_up (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -578,7 +580,7 @@ CLIST_RET _clist_container_up (CLIST *clistp, CLIST_CONTAINER *containerp)
 // 指定のコンテナをリスト後方に１つ移動する関数、（CLISTメソッド）
 CLIST_RET _clist_container_down (CLIST *clistp, CLIST_CONTAINER *containerp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -586,7 +588,7 @@ CLIST_RET _clist_container_down (CLIST *clistp, CLIST_CONTAINER *containerp)
 // リストをソートする関数、（CLISTメソッド）
 CLIST_RET _clist_container_sort (CLIST *clistp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -597,7 +599,7 @@ CLIST_RET _clist_container_dump (CLIST *clistp, CLIST_CONTAINER *containerp)
 	if (clistp != NULL && clistp->dutyp != NULL && clistp->dutyp->dump != NULL) {
 		clistp->dutyp->dump(containerp->datap);
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -614,7 +616,7 @@ CLIST_RET _clist_dump_all (CLIST *clistp)
 		clistp->container_dump(clistp, ccp);
 		ccp = ccp->nextp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -650,7 +652,7 @@ CLIST *clist_create (CLIST_DATAUTY *dutyp)
 	clistp->container_dump = _clist_container_dump;
 	clistp->dump_all = _clist_dump_all;
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return clistp;
 }
 
@@ -665,7 +667,7 @@ CLIST_RET clist_destroy (CLIST *clistp)
 	clistp->container_destroy_all (clistp);
 	free (clistp);
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 
@@ -678,7 +680,7 @@ CLIST_RET clist_destroy (CLIST *clistp)
 // 参照先をidx番目のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data(CLIST_REFERER *crefp, int idx)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return _clist_referer_data_find(crefp, idx, NULL);
 }
 
@@ -686,7 +688,7 @@ void *_clist_referer_data(CLIST_REFERER *crefp, int idx)
 // 参照先を先頭のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_begin(CLIST_REFERER *crefp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return _clist_referer_data_find_begin(crefp, NULL);
 }
 
@@ -694,7 +696,7 @@ void *_clist_referer_data_begin(CLIST_REFERER *crefp)
 //!< 参照先を終端のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_end(CLIST_REFERER *crefp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return _clist_referer_data_find_end(crefp, NULL);
 }
 
@@ -702,7 +704,7 @@ void *_clist_referer_data_end(CLIST_REFERER *crefp)
 // 参照先を１つ前のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_prev(CLIST_REFERER *crefp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return _clist_referer_data_find_prev(crefp, NULL);
 }
 
@@ -710,7 +712,7 @@ void *_clist_referer_data_prev(CLIST_REFERER *crefp)
 // 参照先を１つ次のコンテナに移動し、ユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_next(CLIST_REFERER *crefp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return _clist_referer_data_find_next(crefp, NULL);
 }
 
@@ -718,7 +720,7 @@ void *_clist_referer_data_next(CLIST_REFERER *crefp)
 // 現在の参照先のユーザーデータのポインタを返す関数、（CLISTリファラメソッド）
 void *_clist_referer_data_current(CLIST_REFERER *crefp)
 {
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -730,7 +732,7 @@ int _clist_referer_count(struct _CLIST_REFERER *crefp)
 		CLIST_ERRPR("_clist_referer_data: crefp is NULL");
 		return 0;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return crefp->clistp->container_count;
 }
 
@@ -758,7 +760,7 @@ void *_clist_referer_data_find(struct _CLIST_REFERER *crefp, int idx, void *key)
 		i++;
 		crefp->current = crefp->current->nextp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -784,7 +786,7 @@ void *_clist_referer_data_find_begin(struct _CLIST_REFERER *crefp, void *key)
 		}
 		crefp->current = crefp->current->nextp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -810,7 +812,7 @@ void *_clist_referer_data_find_end(struct _CLIST_REFERER *crefp, void *key)
 		}
 		crefp->current = crefp->current->prevp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -836,7 +838,7 @@ void *_clist_referer_data_find_prev(struct _CLIST_REFERER *crefp, void *key)
 		}
 		crefp->current = crefp->current->prevp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -862,7 +864,7 @@ void *_clist_referer_data_find_next(struct _CLIST_REFERER *crefp, void *key)
 		}
 		crefp->current = crefp->current->nextp;
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return (crefp != NULL && crefp->current != NULL) ? crefp->current->datap : NULL;
 }
 
@@ -907,7 +909,7 @@ CLIST_REFERER *clist_referer_create (CLIST *clistp)
 	crefp->data_find_next = _clist_referer_data_find_next;
 	crefp->find_count = _clist_referer_find_count;
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return crefp;
 }
 
@@ -921,7 +923,7 @@ CLIST_RET clist_referer_destroy (struct _CLIST_REFERER *crefp)
 	}
 	free (crefp);
 
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 	return CLIST_RET_OK;
 }
 #endif // __CLIST_C__
@@ -965,7 +967,7 @@ static void clist_test_data_destroy(void *dp)
 		CLIST_DBGPR ("TEST: data destroyed (%d)", *((int*)dp));
 		free (dp);
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 }
 static void clist_test_data_dump(void *dp)
 {
@@ -973,7 +975,7 @@ static void clist_test_data_dump(void *dp)
 	if (dp) {
 		CLIST_DBGPR ("TEST: DUMP n=%d", datap->n);
 	}
-	CLIST_TEST_CHECK("1/1");	// MODULE TEST
+	CLIST_TEST_ASSERT("1/1",true);	// MODULE TEST
 }
 static CLIST_DATAUTY clist_test_data_uty = {
 	clist_test_data_create,		// create data
@@ -1071,7 +1073,7 @@ void clist_test_main(void)
 		}
 	}
 
-	CLIST_TEST_CHECK_END();
+	CLIST_TEST_ASSERT_CLOSE();
 }
 #endif // __CLIST_TEST_C__
 
