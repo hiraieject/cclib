@@ -554,17 +554,10 @@ void c_vector_dump (c_vector *thisp, char *name)
 		printf ("thisp = NULL\n");
 	} else {
 		int i;
-<<<<<<< HEAD
 		printf ("c_vector %s {\n", name);
 		printf ("    data_num     = %d;\n", thisp->data_num);
 		printf ("    alloced_num  = %d;\n", thisp->alloced_num);
 		printf ("    element_size = %d;\n", thisp->element_size);
-=======
-		printf ("cvector %s {\n", name);
-		printf ("    data_num  = %d,", thisp->data_num);
-		printf (" alloced_num = %d,", thisp->alloced_num);
-		printf (" element_size = %d,", thisp->element_size);
->>>>>>> 4859eb0b3d75e920f44c069dcdd947faa83dc199
 		switch (thisp->data_type) {
 		case CVECTOR_TYPE_CHAR:
 			printf (" data_type = char, ");
