@@ -63,28 +63,28 @@ static FILE *vdbgfp = NULL;
 
 // デバック用強制エラーつきmalloc関数
 #if defined(__CVECTOR_TEST_C__)
-static bool cvector_dbg_force_malloc_error = false;
-void *cvector_dbg_malloc(size_t size) {
-	if (cvector_dbg_force_malloc_error) {
-		cvector_dbg_force_malloc_error = false;
+static bool c_vector_dbg_force_malloc_error = false;
+void *c_vector_dbg_malloc(size_t size) {
+	if (c_vector_dbg_force_malloc_error) {
+		c_vector_dbg_force_malloc_error = false;
 		return NULL;
 	}
 	return malloc(size);
 }
-void *cvector_dbg_realloc(void *ptr, size_t size) {
-	if (cvector_dbg_force_malloc_error) {
-		cvector_dbg_force_malloc_error = false;
+void *c_vector_dbg_realloc(void *ptr, size_t size) {
+	if (c_vector_dbg_force_malloc_error) {
+		c_vector_dbg_force_malloc_error = false;
 		return NULL;
 	}
 	return realloc(ptr,size);
 }
-#define cvector_malloc(size) cvector_dbg_malloc(size)
-#define cvector_realloc(ptr,size) cvector_dbg_realloc(ptr,size)
-#define cvector_force_allocerr() cvector_dbg_force_malloc_error = true
+#define c_vector_malloc(size) c_vector_dbg_malloc(size)
+#define c_vector_realloc(ptr,size) c_vector_dbg_realloc(ptr,size)
+#define c_vector_force_allocerr() c_vector_dbg_force_malloc_error = true
 #else
-#define cvector_malloc(size)   malloc(size)
-#define cvector_realloc(size) remalloc(ptr,size)
-#define cvector_force_allocerr()
+#define c_vector_malloc(size)   malloc(size)
+#define c_vector_realloc(size) remalloc(ptr,size)
+#define c_vector_force_allocerr()
 #endif // defined(__CVECTOR_TEST_C__)
 
 // ============================================================================================ 型宣言、マクロ等
@@ -110,7 +110,7 @@ typedef enum {
 	CVT_VP = CVECTOR_TYPE_VOIDP,	//!< タイプ指定(省略系)　voidp型
 } CVECTOR_TYPE;
 
-typedef struct _cvector {
+typedef struct _c_vector {
 	union {
 		char          *c;
 		unsigned char *uc;
@@ -126,69 +126,72 @@ typedef struct _cvector {
 	int  data_num;
 	int  alloced_num;
 	int  element_size;
-} cvector;
+} c_vector;
 
 #define CVECTOR_ALLOC_MINMUM  10
 #define CVECTOR_ALLOC_RESERVE 5
 
 // ============================================================================================ utility関数 宣言
 
-/// cvectorをallocして初期化　(要素数のみ指定、データ初期値なし(ゼロで初期化))
-extern cvector *cvector_alloc (CVECTOR_TYPE type, int num);
+/// c_vectorをallocして初期化　(要素数のみ指定、データ初期値なし(ゼロで初期化))
+extern c_vector *c_vector_alloc (CVECTOR_TYPE type, int num);
 
-/// cvectorを解放する
-extern void cvector_free (cvector *thisp);
+/// c_vectorを解放する
+extern void c_vector_free (c_vector *thisp);
 
-/// cvectorのデータ領域を指定要素数にリサイズ、成功時trueを返す
-extern bool cvector_resize (cvector *thisp, int num);
+/// malloc以外で宣言されている c_vector型変数を初期化する　(要素数のみ指定、データ初期値なし(ゼロで初期化))、すでに初期化済みの変数に実行するとメモリリークするので使用厳禁
+extern c_vector *c_vector_init (c_vector *thisp, CVECTOR_TYPE type, int num);
 
-/// cvectorの確保メモリが要素数に対して最適になるようにリサイズ（リザーブ領域は確保されない）、成功時trueを返す
-extern bool cvector_shrink (cvector *thisp);
+/// c_vectorのデータ領域を指定要素数にリサイズ、成功時trueを返す
+extern bool c_vector_resize (c_vector *thisp, int num);
 
-/// cvectorを初期化、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
-extern bool cvector_dataset_arg (cvector *thisp, int num, ...);
+/// c_vectorの確保メモリが要素数に対して最適になるようにリサイズ（リザーブ領域は確保されない）、成功時trueを返す
+extern bool c_vector_shrink (c_vector *thisp);
 
-/// cvectorを初期化、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
-extern bool cvector_dataset_array (cvector *thisp, int num, ...);
+/// c_vectorを初期化、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
+extern bool c_vector_dataset_arg (c_vector *thisp, int num, ...);
 
-/// cvectorを初期化、処理内容としては、source からの deep copy と等しい。、成功時trueを返す
-extern bool cvector_dataset_cvector (cvector *thisp, cvector *source);
+/// c_vectorを初期化、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
+extern bool c_vector_dataset_array (c_vector *thisp, int num, ...);
 
-/// cvectorの配列後方にデータを追加する、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
-extern bool cvector_addlast_arg (cvector *thisp, int num, ...);
+/// c_vectorを初期化、処理内容としては、source からの deep copy と等しい。、成功時trueを返す
+extern bool c_vector_dataset_c_vector (c_vector *thisp, c_vector *source);
 
-/// cvectorの配列後方にデータを追加する、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
-extern bool cvector_addlast_array (cvector *thisp, int num, ...);
+/// c_vectorの配列後方にデータを追加する、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
+extern bool c_vector_addlast_arg (c_vector *thisp, int num, ...);
 
-/// cvectorの配列後方にデータを追加する、(要素数指定あり、データ初期値あり(cvector(int型))、必要に応じてresizeも行われる、成功時trueを返す
-extern bool cvector_addlast_cvector (cvector *thisp, cvector *source);
+/// c_vectorの配列後方にデータを追加する、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる、成功時trueを返す
+extern bool c_vector_addlast_array (c_vector *thisp, int num, ...);
 
-/// cvectorの配列要素をゼロクリアする
-extern void cvector_zeros (cvector *thisp);
+/// c_vectorの配列後方にデータを追加する、(要素数指定あり、データ初期値あり(c_vector(int型))、必要に応じてresizeも行われる、成功時trueを返す
+extern bool c_vector_addlast_c_vector (c_vector *thisp, c_vector *source);
 
-/// cvectorの配列をゼロにリサイズ、要素数はゼロとなる
-extern void cvector_clear (cvector *thisp);
+/// c_vectorの配列要素をゼロクリアする
+extern void c_vector_zeros (c_vector *thisp);
 
-/// cvectorの要素数を返す
-extern int cvector_size (cvector *thisp);
+/// c_vectorの配列をゼロにリサイズ、要素数はゼロとなる
+extern void c_vector_clear (c_vector *thisp);
 
-/// cvectorの内容をダンプする、デバック用
-extern void cvector_dump (cvector *thisp, char *name);
+/// c_vectorの要素数を返す
+extern int c_vector_size (c_vector *thisp);
+
+/// c_vectorの内容をダンプする、デバック用
+extern void c_vector_dump (c_vector *thisp, char *name);
 
 // ============================================================================================ utility関数 実装
 #ifdef __CVECTOR_C__
 
-/// cvectorをallocして初期化　(要素数のみ指定、データ初期値なし(ゼロで初期化))
-cvector *cvector_alloc (CVECTOR_TYPE type, int num)
+/// c_vectorをallocして初期化　(要素数のみ指定、データ初期値なし(ゼロで初期化))
+c_vector *c_vector_alloc (CVECTOR_TYPE type, int num)
 {
-	// cvector 構造体のalloc
-	cvector *thisp = (cvector*)cvector_malloc(sizeof(cvector));
+	// c_vector 構造体のalloc
+	c_vector *thisp = (c_vector*)c_vector_malloc(sizeof(c_vector));
 	if (thisp == NULL) {
-		CVECTOR_ERRPR("cvector malloc error");
+		CVECTOR_ERRPR("c_vector malloc error");
 		CVECTOR_TEST_ASSERT("1/3 error check: thisp malloc errpr",(thisp == NULL));
 		return NULL;
 	}
-	memset (thisp, 0, sizeof(cvector)); // ゼロクリア
+	memset (thisp, 0, sizeof(c_vector)); // ゼロクリア
 
 	// elementsize設定
 	switch (type) {
@@ -209,9 +212,9 @@ cvector *cvector_alloc (CVECTOR_TYPE type, int num)
 	if (thisp->alloced_num < CVECTOR_ALLOC_MINMUM) {
 		thisp->alloced_num = CVECTOR_ALLOC_MINMUM;		//  最小サイズを適用
 	}
-	thisp->data.ptr = cvector_malloc(thisp->alloced_num * thisp->element_size);
+	thisp->data.ptr = c_vector_malloc(thisp->alloced_num * thisp->element_size);
 	if (thisp->data.ptr == NULL) {
-		CVECTOR_ERRPR("cvector->data malloc error");
+		CVECTOR_ERRPR("c_vector->data malloc error");
 		CVECTOR_TEST_ASSERT("2/3 error check: thisp->data malloc error",(thisp->data.vp == NULL));
 		free (thisp);
 		return NULL;
@@ -224,8 +227,8 @@ cvector *cvector_alloc (CVECTOR_TYPE type, int num)
 	return thisp;
 }
 
-/// cvectorを解放する
-void cvector_free (cvector *thisp)
+/// c_vectorを解放する
+void c_vector_free (c_vector *thisp)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
@@ -236,8 +239,8 @@ void cvector_free (cvector *thisp)
 	CVECTOR_TEST_ASSERT("2/2 free OK",(thisp != NULL));
 }
 
-/// cvectorのデータ領域を指定要素数にリサイズ、成功時trueを返す、失敗時はfalseが返るがthisp自体がfreeされるので注意！
-bool cvector_resize (cvector *thisp, int num)
+/// c_vectorのデータ領域を指定要素数にリサイズ、成功時trueを返す、失敗時はfalseが返るがthisp自体がfreeされるので注意！
+bool c_vector_resize (c_vector *thisp, int num)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
@@ -250,7 +253,7 @@ bool cvector_resize (cvector *thisp, int num)
 		thisp->data_num    = num;
 		thisp->alloced_num = num + CVECTOR_ALLOC_RESERVE;
 		CVECTOR_DBGPR("do realloc %d->%d",(old_alloced_num * thisp->element_size),(thisp->alloced_num * thisp->element_size));
-		thisp->data.ptr = cvector_realloc(thisp->data.ptr, thisp->alloced_num * thisp->element_size);
+		thisp->data.ptr = c_vector_realloc(thisp->data.ptr, thisp->alloced_num * thisp->element_size);
 		if (thisp->data.ptr == NULL) {
 			// realloc失敗
 			CVECTOR_ERRPR("realloc failed");
@@ -269,8 +272,8 @@ bool cvector_resize (cvector *thisp, int num)
 	CVECTOR_TEST_ASSERT("3/3 dataset OK",true);
 	return true;
 }
-/// cvectorの確保メモリが要素数に対して最適になるようにリサイズ（リザーブ領域は確保されない）、成功時trueを返す
-bool cvector_shrink (cvector *thisp)
+/// c_vectorの確保メモリが要素数に対して最適になるようにリサイズ（リザーブ領域は確保されない）、成功時trueを返す
+bool c_vector_shrink (c_vector *thisp)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
@@ -281,7 +284,7 @@ bool cvector_shrink (cvector *thisp)
 	if (thisp->alloced_num != thisp->data_num) {
 		// サイズ変更必要
 		thisp->alloced_num = thisp->data_num;
-		thisp->data.ptr = cvector_realloc(thisp->data.ptr, thisp->alloced_num * thisp->element_size);
+		thisp->data.ptr = c_vector_realloc(thisp->data.ptr, thisp->alloced_num * thisp->element_size);
 		if (thisp->data.ptr == NULL) {
 			// realloc失敗
 			CVECTOR_ERRPR("realloc failed");
@@ -301,8 +304,8 @@ bool cvector_shrink (cvector *thisp)
 }
 
 
-/// cvectorを初期化、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる
-bool cvector_dataset_arg (cvector *thisp, int num, ...)
+/// c_vectorを初期化、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる
+bool c_vector_dataset_arg (c_vector *thisp, int num, ...)
 {
 	bool ret = false;
 	if (thisp == NULL) {
@@ -312,7 +315,7 @@ bool cvector_dataset_arg (cvector *thisp, int num, ...)
 	}
 	if (thisp->alloced_num < num) {
 		// 領域がたらないのでリサイズ必要
-		if (cvector_resize(thisp,num) == false) {
+		if (c_vector_resize(thisp,num) == false) {
 			// リサイズ失敗
 			CVECTOR_ERRPR("realloc failed");
 			CVECTOR_TEST_ASSERT("2/3 error check: realloc error",true);
@@ -346,8 +349,8 @@ bool cvector_dataset_arg (cvector *thisp, int num, ...)
 	return ret;
 }
 
-/// cvectorを初期化、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる
-bool cvector_dataset_array (cvector *thisp, int num, ...)
+/// c_vectorを初期化、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる
+bool c_vector_dataset_array (c_vector *thisp, int num, ...)
 {
 	bool ret = false;
 	if (thisp == NULL) {
@@ -357,7 +360,7 @@ bool cvector_dataset_array (cvector *thisp, int num, ...)
 	}
 	if (thisp->alloced_num < num) {
 		// 領域がたらないのでリサイズ必要
-		if (cvector_resize(thisp,num) == false) {
+		if (c_vector_resize(thisp,num) == false) {
 			// リサイズ失敗
 			CVECTOR_ERRPR("realloc failed");
 			CVECTOR_TEST_ASSERT("2/3 error check: realloc error",true);
@@ -379,8 +382,8 @@ bool cvector_dataset_array (cvector *thisp, int num, ...)
 	return true;
 }
 
-/// cvectorを初期化、処理内容としては、source からの deep copy
-bool cvector_dataset_cvector (cvector *thisp, cvector *source)
+/// c_vectorを初期化、処理内容としては、source からの deep copy
+bool c_vector_dataset_c_vector (c_vector *thisp, c_vector *source)
 {
 	bool ret = false;
 	if (thisp == NULL || source == NULL) {
@@ -396,7 +399,7 @@ bool cvector_dataset_cvector (cvector *thisp, cvector *source)
 	}
 	if (thisp->alloced_num < source->data_num) {
 		// 領域がたらないのでリサイズ必要
-		if (cvector_resize(thisp,source->data_num) == false) {
+		if (c_vector_resize(thisp,source->data_num) == false) {
 			// リサイズ失敗
 			CVECTOR_ERRPR("realloc failed");
 			CVECTOR_TEST_ASSERT("3/4 error check: realloc error",true);
@@ -415,8 +418,8 @@ bool cvector_dataset_cvector (cvector *thisp, cvector *source)
 	return true;
 }
 
-/// cvectorの配列後方にデータを追加する、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる
-bool cvector_addlast_arg (cvector *thisp, int num, ...)
+/// c_vectorの配列後方にデータを追加する、代入値は要素数と列挙データで指定、領域が足らない場合に限りresizeも行われる
+bool c_vector_addlast_arg (c_vector *thisp, int num, ...)
 {
 	bool ret = false;
 	if (thisp == NULL) {
@@ -427,7 +430,7 @@ bool cvector_addlast_arg (cvector *thisp, int num, ...)
 	int org_data_num = thisp->data_num;
 	if (thisp->alloced_num < (org_data_num+num)) {
 		// 領域がたらないのでリサイズ必要
-		if (cvector_resize(thisp,(org_data_num+num)) == false) {
+		if (c_vector_resize(thisp,(org_data_num+num)) == false) {
 			// リサイズ失敗
 			CVECTOR_ERRPR("realloc failed");
 			CVECTOR_TEST_ASSERT("2/3 error check: realloc error",true);
@@ -461,8 +464,8 @@ bool cvector_addlast_arg (cvector *thisp, int num, ...)
 	return ret;
 }
 
-/// cvectorの配列後方にデータを追加する、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる
-bool cvector_addlast_array (cvector *thisp, int num, ...)
+/// c_vectorの配列後方にデータを追加する、代入値は要素数と配列の先導アドレスで指定、領域が足らない場合に限りresizeも行われる
+bool c_vector_addlast_array (c_vector *thisp, int num, ...)
 {
 	bool ret = false;
 	if (thisp == NULL) {
@@ -473,7 +476,7 @@ bool cvector_addlast_array (cvector *thisp, int num, ...)
 	int org_data_num = thisp->data_num;
 	if (thisp->alloced_num < (org_data_num+num)) {
 		// 領域がたらないのでリサイズ必要
-		if (cvector_resize(thisp,(org_data_num+num)) == false) {
+		if (c_vector_resize(thisp,(org_data_num+num)) == false) {
 			// リサイズ失敗
 			CVECTOR_ERRPR("realloc failed");
 			CVECTOR_TEST_ASSERT("2/3 error check: realloc error",true);
@@ -496,15 +499,15 @@ bool cvector_addlast_array (cvector *thisp, int num, ...)
 	return true;
 }
 
-/// cvectorの配列後方にデータを追加する、(要素数指定あり、データ初期値あり(cvector(int型))、必要に応じてresizeも行われる
-bool cvector_addlast_cvector (cvector *thisp, cvector *source)
+/// c_vectorの配列後方にデータを追加する、(要素数指定あり、データ初期値あり(c_vector(int型))、必要に応じてresizeも行われる
+bool c_vector_addlast_c_vector (c_vector *thisp, c_vector *source)
 {
 	CVECTOR_TEST_ASSERT("1/1 addlast cvecor OK",true);
-	return cvector_addlast_array (thisp, source->data_num, source->data.ptr);
+	return c_vector_addlast_array (thisp, source->data_num, source->data.ptr);
 }
 
-/// cvectorの配列要素をゼロクリアする
-void cvector_zeros (cvector *thisp)
+/// c_vectorの配列要素をゼロクリアする
+void c_vector_zeros (c_vector *thisp)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
@@ -515,15 +518,15 @@ void cvector_zeros (cvector *thisp)
 	CVECTOR_TEST_ASSERT("2/2 zeroclr OK",true);
 }
 
-/// cvectorの配列をゼロにリサイズ、要素数はゼロとなる
-void cvector_clear (cvector *thisp)
+/// c_vectorの配列をゼロにリサイズ、要素数はゼロとなる
+void c_vector_clear (c_vector *thisp)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
 		CVECTOR_TEST_ASSERT("1/2 error check: arg error",thisp == NULL);
 		return;
 	}
-	if (cvector_resize(thisp,0) == false) {
+	if (c_vector_resize(thisp,0) == false) {
 		// リサイズ失敗
 		CVECTOR_ERRPR("realloc failed");
 		CVECTOR_TEST_ASSERT("2/3 error check: realloc error",true);
@@ -532,8 +535,8 @@ void cvector_clear (cvector *thisp)
 	CVECTOR_TEST_ASSERT("3/3 clear OK",true);
 }
 
-/// cvectorの要素数を返す
-int cvector_size (cvector *thisp)
+/// c_vectorの要素数を返す
+int c_vector_size (c_vector *thisp)
 {
 	if (thisp == NULL) {
 		CVECTOR_ERRPR("arg thisp is NULL");
@@ -544,14 +547,14 @@ int cvector_size (cvector *thisp)
 	return thisp->data_num;
 }
 
-/// cvectorの内容をダンプする、デバック用
-void cvector_dump (cvector *thisp, char *name)
+/// c_vectorの内容をダンプする、デバック用
+void c_vector_dump (c_vector *thisp, char *name)
 {
 	if (thisp == NULL) {
 		printf ("thisp = NULL\n");
 	} else {
 		int i;
-		printf ("cvector %s {\n", name);
+		printf ("c_vector %s {\n", name);
 		printf ("    data_num     = %d;\n", thisp->data_num);
 		printf ("    alloced_num  = %d;\n", thisp->alloced_num);
 		printf ("    element_size = %d;\n", thisp->element_size);
@@ -617,95 +620,95 @@ void cvector_dump (cvector *thisp, char *name)
  * @brief  CVECTOR　モジュールテスト関数 兼 実装サンプル
  * @details　基本的にはCVECTORのモジュールテストで使用するための関数で無効化されていますが、実装サンプルコードとして参照できるように実装・コメント記載しています。使用法が不明な場合はこちらを参照してください
  */
-extern void cvector_test_main(void);
+extern void c_vector_test_main(void);
 
 #ifdef __CVECTOR_TEST_C__
-void cvector_test_main(void)
+void c_vector_test_main(void)
 {
-	cvector *cvectp;
-	cvector *cvectp_2;
+	c_vector *cvectp;
+	c_vector *cvectp_2;
 
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 0);
-	cvector_dump (cvectp, (char*)"cvector.alloc(0)");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 0);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(0)");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 5);
-	cvector_dump (cvectp, (char*)"cvector.alloc(5)");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 5);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(5)");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 9);
-	cvector_dump (cvectp, (char*)"cvector.alloc(9)");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 9);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(9)");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 10);
-	cvector_dump (cvectp, (char*)"cvector.alloc(10)");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 10);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(10)");
+	c_vector_free (cvectp);
 
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 0);
-	cvector_dump (cvectp, (char*)"cvector.alloc(0)");
-	cvector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg(6, 1,2,3,4,5,6)");
-	cvector_addlast_arg (cvectp, 6, -1,-2,-3,-4,-5,-127);
-	cvector_dump (cvectp, (char*)"cvector.addlast_arg(6, -1,-2,-3,-4,-5,-127)");
-	cvector_resize (cvectp, 5);
-	cvector_dump (cvectp, (char*)"cvector.resize(5)");
-	cvector_zeros (cvectp);
-	cvector_dump (cvectp, (char*)"cvector.zeros()");
-	cvector_clear (cvectp);
-	cvector_dump (cvectp, (char*)"cvector.clear()");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 0);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(0)");
+	c_vector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg(6, 1,2,3,4,5,6)");
+	c_vector_addlast_arg (cvectp, 6, -1,-2,-3,-4,-5,-127);
+	c_vector_dump (cvectp, (char*)"c_vector.addlast_arg(6, -1,-2,-3,-4,-5,-127)");
+	c_vector_resize (cvectp, 5);
+	c_vector_dump (cvectp, (char*)"c_vector.resize(5)");
+	c_vector_zeros (cvectp);
+	c_vector_dump (cvectp, (char*)"c_vector.zeros()");
+	c_vector_clear (cvectp);
+	c_vector_dump (cvectp, (char*)"c_vector.clear()");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 0);
- 	cvectp_2 = cvector_alloc (CVECTOR_TYPE_CHAR, 0);
-	cvector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
-	cvector_dump (cvectp, (char*)"cvector.alloc(0)");
-	cvector_dataset_cvector (cvectp_2, cvectp);
-	cvector_dump (cvectp_2, (char*)"cvector_2.dataset(cvector)");
-	cvector_free (cvectp);
-	cvector_free (cvectp_2);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 0);
+ 	cvectp_2 = c_vector_alloc (CVECTOR_TYPE_CHAR, 0);
+	c_vector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
+	c_vector_dump (cvectp, (char*)"c_vector.alloc(0)");
+	c_vector_dataset_c_vector (cvectp_2, cvectp);
+	c_vector_dump (cvectp_2, (char*)"c_vector_2.dataset(c_vector)");
+	c_vector_free (cvectp);
+	c_vector_free (cvectp_2);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_INT, 0);
-	cvector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg(6, 1,2,3,4,5,6) <int>");
-	cvector_zeros (cvectp);
-	cvector_dump (cvectp, (char*)"cvector.zeros() <float>");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_INT, 0);
+	c_vector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg(6, 1,2,3,4,5,6) <int>");
+	c_vector_zeros (cvectp);
+	c_vector_dump (cvectp, (char*)"c_vector.zeros() <float>");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_FLOAT, 0);
-	cvector_dataset_arg (cvectp, 6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6);
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg(6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6) <float>");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_FLOAT, 0);
+	c_vector_dataset_arg (cvectp, 6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6);
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg(6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6) <float>");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_DOUBLE, 0);
-	cvector_dataset_arg (cvectp, 6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6);
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg(6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6) <double>");
-	cvector_free (cvectp);
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_DOUBLE, 0);
+	c_vector_dataset_arg (cvectp, 6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6);
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg(6, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6) <double>");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_VOIDP, 0);
-	cvector_dataset_arg (cvectp, 3, (voidp)"str1", (voidp)"str2", (voidp)"str3");
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg((voidp)\"str1\", (voidp)\"str2\", (voidp)\"str3\") <voidp>");
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_VOIDP, 0);
+	c_vector_dataset_arg (cvectp, 3, (voidp)"str1", (voidp)"str2", (voidp)"str3");
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg((voidp)\"str1\", (voidp)\"str2\", (voidp)\"str3\") <voidp>");
 	{
-		int i,size=cvector_size(cvectp);
+		int i,size=c_vector_size(cvectp);
 		for (i=0; i<size; i++) {
 			printf ("## data.vp[%d] = %s\n", i, (char*)(cvectp->data.vp[i]));
 		}
 	}
-	cvector_zeros (cvectp);
-	cvector_dump (cvectp, (char*)"cvector.zeros() <float>");
-	cvector_free (cvectp);
+	c_vector_zeros (cvectp);
+	c_vector_dump (cvectp, (char*)"c_vector.zeros() <float>");
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
- 	cvectp = cvector_alloc (CVECTOR_TYPE_CHAR, 0);
-	cvector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
-	cvector_dump (cvectp, (char*)"cvector.dataset_arg(6, 1,2,3,4,5,6)");
+ 	cvectp = c_vector_alloc (CVECTOR_TYPE_CHAR, 0);
+	c_vector_dataset_arg (cvectp, 6, 1,2,3,4,5,6);
+	c_vector_dump (cvectp, (char*)"c_vector.dataset_arg(6, 1,2,3,4,5,6)");
 	{
-		int i,size=cvector_size(cvectp);
+		int i,size=c_vector_size(cvectp);
 		for (i=0; i<size; i++) {
 			printf ("## data.c[%d] = %d\n", i, cvectp->data.c[i]);
 		}
 	}
-	cvector_free (cvectp);
+	c_vector_free (cvectp);
 	printf ("---------------------------\n");
 
 	

@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	printf ("--------\n");
 
 	clist_test_main();
-	cvector_test_main();
+	c_vector_test_main();
 
 	printf ("--------\n");
 	
