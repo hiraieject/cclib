@@ -554,62 +554,61 @@ void c_vector_dump (c_vector *thisp, char *name)
 		printf ("thisp = NULL\n");
 	} else {
 		int i;
+<<<<<<< HEAD
 		printf ("c_vector %s {\n", name);
 		printf ("    data_num     = %d;\n", thisp->data_num);
 		printf ("    alloced_num  = %d;\n", thisp->alloced_num);
 		printf ("    element_size = %d;\n", thisp->element_size);
+=======
+		printf ("cvector %s {\n", name);
+		printf ("    data_num  = %d,", thisp->data_num);
+		printf (" alloced_num = %d,", thisp->alloced_num);
+		printf (" element_size = %d,", thisp->element_size);
+>>>>>>> 4859eb0b3d75e920f44c069dcdd947faa83dc199
 		switch (thisp->data_type) {
 		case CVECTOR_TYPE_CHAR:
-			printf ("    data_type = char;\n");
-			printf ("    data.c[] = {\n");
-			printf ("        ");
+			printf (" data_type = char, ");
+			printf (" #### data.c[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%d ", thisp->data.c[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_UCHAR:
-			printf ("    data_type = unsigned char;\n");
-			printf ("    data.uc[] = {\n");
-			printf ("        ");
+			printf (" data_type = unsigned char, ");
+			printf (" #### data.uc[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%d ", thisp->data.uc[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_INT:
-			printf ("    data_type = int;\n");
-			printf ("    data.i[] = {\n");
-			printf ("        ");
+			printf (" data_type = int, ");
+			printf (" #### data.i[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%d ", thisp->data.i[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_UINT:
-			printf ("    data_type = unsigned int;\n");
-			printf ("    data.ui[] = {\n");
-			printf ("        ");
+			printf (" data_type = unsigned int, ");
+			printf (" #### data.ui[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%d ", thisp->data.ui[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_FLOAT:
-			printf ("    data_type = float;\n");
-			printf ("    data.f[] = {\n");
-			printf ("        ");
+			printf (" data_type = float, ");
+			printf (" #### data.f[%d] = {", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%f ", thisp->data.f[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_DOUBLE:
-			printf ("    data_type = double;\n");
-			printf ("    data.d[] = {\n");
-			printf ("        ");
+			printf (" data_type = double, ");
+			printf (" #### data.d[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%f ", thisp->data.d[i]);
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		case CVECTOR_TYPE_VOIDP:
-			printf ("    data_type = voidp;\n");
-			printf ("    data.vp[] = {\n");
-			printf ("        ");
+			printf (" data_type = voidp, ");
+			printf (" #### data.vp[%d] = { ", thisp->data_num);
 			for (i=0; i<thisp->data_num; i++) printf ("%08lx ", (unsigned long)(thisp->data.vp[i]));
-			printf ("\n    } reserved num %d \n", thisp->alloced_num-thisp->data_num);
+			printf (" } reserved num %d \n", thisp->alloced_num-thisp->data_num);
 			break;
 		}
-		printf ("}\n");
 	}
 }
 
