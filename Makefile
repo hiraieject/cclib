@@ -63,14 +63,8 @@ $(COBJDIR)/%.o: %.c
 
 clean:
 	rm -rf $(OBJDIR) $(TARGET)
-
-.PHONY: gtags clean_gtags
-gtags:
-	@echo "do gtags"
-	@-gtags
-clean_gtags:
-	rm -f GPATH GRTAGS GTAGS
-
+distclean:
+	rm -rf $(OBJDIR) $(TARGET) build html latex rtf GPATH GRTAGS GTAGS
 
 test:
 	gdb $(TARGET)
@@ -93,3 +87,6 @@ doxygen_check_doxyfile:
 	@doxygen -g Doxyfile_org > /dev/null
 	diff Doxyfile_org Doxyfile
 	rm -f Doxyfile_org
+
+gcommit gpush gpull gdiff gtags gtagsclean:
+	(cd ..; make $@)
