@@ -1,72 +1,53 @@
-/* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
 /**
- * @file wb_fifo.h
- * @brief thread class for C++  by hirai
+ * @file cc_thread.h
+ * @brief thread class for C++
  */
 
 #ifndef __CC_THREAD_H__
 #define __CC_THREAD_H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <pthread.h>
+#include <cstdio>
+#include <iostream>
+#include <thread>
+#include <mutex>
 
-#include "cc_fifo.h"
+#include "cc_debugprint.h"
+#include "cc_message.h"
 
-#undef CC_THREAD_DBGPR
-#undef CC_THREAD_ERRPR
-#undef CC_THREAD_WARNPR
-#define CC_THREAD_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#define CC_THREAD_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-
-#if !defined(CC_THREAD_ENB_DBGPR)
-#define CC_THREAD_DBGPR(fmt, args...)
-#else 
-#define CC_THREAD_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
-#endif
-
-///
-/// ■■■■■　thread 制御クラス
-///
+/**
+ * @class cc_thread
+ * @brief C++用 汎用スレッドクラス
+ * 
+ * More detailed description of the class.
+ */
 class cc_thread {
-private:
+protected:
+    std::thread thread_obj;                     ///< class thread のインスタンス
+	bool thread_loop;							///< スレッドループ有効フラグ、falseにするとスレッドループを抜ける
+    bool thread_enable;                         ///< スレッド起動中フラグ
+    std::mutex mtx;                             ///< cc_threadが保持する変数保護用
+
+    bool loop_continue(void);                   // ループ継続判定
+    virtual void thread_main (void) = 0;        // threadのメイン関数、継承先のクラスで必ず定義しなければならない
+    
 public:
-	// ---------------------------------------------------------
-	pthread_t thread_id;							/// ■■■■■　スレッドID
-	bool thread_loop;								/// ■■■■■　スレッドループ有効フラグ、falseにするとスレッドループを抜ける
+    // public functions
+	cc_thread (key_t message_key, std::string nickname);           // コンストラクター
+    ~cc_thread ();                              // デストラクター
 
-	cc_fifo *fifo_to_thread;						/// ■■■■■　メインからスレッド向けのFIFO
-	cc_fifo	*fifo_from_thread;						/// ■■■■■　スレッドからメイン向けのFIFO
+    void set_loop_continue(bool enb);           // ループ継続判定設定
 
-	// ---------------------------------------------------------
-	cc_thread (bool thread_up_flg, void * (*start_routine)(void *)=thread_func_template);/// ■■■■■　コンストラクタ
-	virtual ~cc_thread ();							/// ■■■■■　デストラクタ
+    // スレッド制御系
+    void thread_up (void);                      // スレッド起動
+    void thread_down (void);                    // スレッド停止
+    void thread_detach (void);                  // スレッドdetache
 
-	static void *thread_func_template (void *arg);	/// ■■■■■　再定義用スレッド関数（継承先で再定義すること）
-	virtual bool thread_up (void * (*start_routine)(void *)); /// ■■■■■　スレッド起動
-	virtual bool thread_down (void);				/// ■■■■■　スレッド停止
-
-	int send_to_thread (void *dptr, int dsize);		/// ■■■■■　メインからスレッドにデータ送信
-	int recv_to_thread (void *bptr, int bsize);		/// ■■■■■　メインからのデータをスレッドで受信
-
-	int send_from_thread (void *dptr, int dsize);	/// ■■■■■　スレッドからメインにデータ送信
-	int recv_from_thread (void *bptr, int bsize);	/// ■■■■■　スレッドからのデータをメインで受信
+    // public variables
+    std::string nickname;                       ///< ニックネーム
+    cc_debugprint thread_dbg;                   ///< cclib debugprint
+    cc_message message;                         ///< cclib message
 };
 
 #endif// __CC_THREAD_H__

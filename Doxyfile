@@ -33,7 +33,7 @@ DOXYFILE_ENCODING      = UTF-8
 # The default value is: My Project.
 
 ##PROJECT_NAME           = "My Project"
-PROJECT_NAME           = "YOS code template"
+PROJECT_NAME           = "cclib for me"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version

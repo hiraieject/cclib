@@ -1,8 +1,8 @@
-/* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
 /**
- * @file wb_fifo.h
- * @brief udp communication class for C++  by hirai
+ * @file cc_udpcomm.h
+ * @brief udp communication class for C++
  */
 
 #ifndef __CC_UDPCOMM_H__
@@ -31,15 +31,15 @@
 #undef CC_UDPCOMM_ERRPR
 #undef CC_UDPCOMM_WARNPR
 #define CC_UDPCOMM_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
-#define CC_UDPCOMM_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+#define CC_UDPCOMM_WARNPR(fmt, args...)                                         \
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
 
 #if !defined(CC_UDPCOMM_ENB_DBGPR)
 #define CC_UDPCOMM_DBGPR(fmt, args...)
 #else 
-#define CC_UDPCOMM_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
+#define CC_UDPCOMM_DBGPR(fmt, args...)  \
+    { printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
 #endif
 
 ///
@@ -47,52 +47,54 @@
 ///
 class cc_udpsend {
 private:
-	int sock;
-	struct sockaddr_in addr;
-	bool connected;
+    int sock;
+    struct sockaddr_in addr;
+    bool connected;
 public:
-	cc_udpsend (void);
-	virtual ~cc_udpsend ();		// 継承用なのでvirtual
+    cc_udpsend (void);
+    virtual ~cc_udpsend ();     // 継承用なのでvirtual
 
-	bool connect (unsigned int port, in_addr_t ipaddr, bool bcast=false);
-	bool disconnect (void);
-	bool get_status (void);
-	void get_ip (struct in_addr &in);
-	void get_ifinfo (struct ifreq &ifr);	// inet_ntoa((&(ifr.ifr_addr))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
+    bool connect (unsigned int port, in_addr_t ipaddr, bool bcast=false);
+    bool disconnect (void);
+    bool get_status (void);
+    void get_ip (struct in_addr &in);
+    void get_ifinfo (struct ifreq &ifr);    // inet_ntoa((&(ifr.ifr_addr))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
 
-	ssize_t send (unsigned char *dptr, int dsize);
+    ssize_t send (unsigned char *dptr, int dsize);
 };
 
 ///
 /// ■■■■■　UDP 送信クラス
 ///
 class cc_udprecv : public cc_thread {
-private:
-	int sock;
-	struct sockaddr_in addr;
-	bool connected;
-public:
-	int  buffersize;
-	unsigned char *buffer;
+    
+ private:
+    int sock;
+    struct sockaddr_in addr;
+    bool connected;
 
-	static void *thread_func (void *arg);
-	
-	cc_udprecv (void);
-	virtual ~cc_udprecv ();		// 継承用なのでvirtual
+ public:
+    int  buffersize;
+    unsigned char *buffer;
 
-	bool connect (unsigned int port, in_addr_t ipaddr, int bsize=1024);
-	bool disconnect (void);
-	bool get_status (void);
-	void get_ip (struct in_addr &in);
-	void get_ifinfo (struct ifreq &ifr);	// inet_ntoa((&(ifr.ifr_addr))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
-											// inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
+    static void *thread_func (void *arg);
+    
+    cc_udprecv (void);
+    virtual ~cc_udprecv ();     // 継承用なのでvirtual
 
-	virtual void datarecv (ssize_t rcvsize, struct sockaddr_in from); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
+    bool connect (unsigned int port, in_addr_t ipaddr, int bsize=1024);
+    bool disconnect (void);
+    bool get_status (void);
+    void get_ip (struct in_addr &in);
+    void get_ifinfo (struct ifreq &ifr);    // inet_ntoa((&(ifr.ifr_addr))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_broadaddr))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_netmask))->sin_addr)
+                                            // inet_ntoa((&(ifr.ifr_hwaddr))->sin_addr)
+
+    virtual void datarecv (ssize_t rcvsize, struct sockaddr_in from); // この関数は main thread ではなく thread_func のコンテキストで呼ばれるので注意
 };
 
 #endif// __CC_UDPCOMM_H__

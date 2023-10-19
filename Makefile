@@ -1,92 +1,108 @@
 
-TARGET   = ycttest
-CSRCS    = cmain.c
-CCSRCS   = main.cc cc_udpcomm.cc cc_thread.cc
-LIBS     = -lpthread
+BUILD_TOP_DIR = .
+include $(BUILD_TOP_DIR)/conf/makefile.inc
 
-CPPFLAGS  += -g -MD
-CPPFLAGS  += -Wall
-CPPFLAGS  += -Werror
+CSRCS    =
+CSRCS   += c_message.c
+CCSRCS   =
+CCSRCS  += cc_message.cc
+CCSRCS  += cc_thread.cc
+CCSRCS  += cc_tcpcomm.cc
+# CCSRCS  += cc_udpcomm.cc
+CPPSRCS += 
+TARGET   = cclib.a
 
-CPPFLAGS  += -DCC_UDPCOMM_ENB_DBGPR
-CPPFLAGS  += -DCC_THREAD_ENB_DBGPR
-CPPFLAGS  += -DCC_FIFO_ENB_DBGPR
+LDFLAGS   += -lpthread
 
-CFLAGS    += -DC_LIST_ENB_DBGPR
-CFLAGS    += -DC_VECTOR_ENB_DBGPR
+# ------------------------------------------------------
+.PHONY: all clean distclean install
+.PHONY: unittest_all unittest_clean unittest_distclean
 
-CFLAGS  += -g -MD
-CFLAGS  += -Wall
-CFLAGS  += -Werror
+all unittest_all:
+	@make mkobjdir
+	make $(OBJDIR)/$(TARGET)
 
-CPPOBJDIR   = objs_cpp
-CPPOBJS     = $(addprefix $(CPPOBJDIR)/, $(CCSRCS:.cc=.o))
+$(OBJS): Makefile ../../conf/makefile.inc
 
-COBJDIR   = objs_c
-COBJS     = $(addprefix $(COBJDIR)/, $(CSRCS:.c=.o))
+$(OBJDIR)/$(TARGET): $(OBJS)
+	$(AR) rcs $@ $(OBJS)
 
-CPP       = g++
-CPPFLAGS   += -std=gnu++11
+clean unittest_clean distclean unittest_distclean:
+	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
+	@make cleanobjdir
 
-CC       = g++
-#CFLAGS   += -std=c99
+install:
+	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
+
+# ------------------------------------------------------ sample_tcpserver/client
+SAMPLETCP_PORT = 5000
+SAMPLETCP_CMAX = 10
+SAMPLETCP_IP   = 127.0.0.1
+
+sampletcp:
+	make BUILDTYPE=Debug all
+	make BUILDTYPE=Debug _sampletcp
+_sampletcp: $(OBJDIR)/sample_tcpserver $(OBJDIR)/sample_tcpclient
+
+sample_tcpserver_run:
+	make sample_tcpserver_kill
+	sudo $(OBJDIR)/sample_tcpserver -p$(SAMPLETCP_PORT) -m$(SAMPLETCP_CMAX) &
+sample_tcpserver_kill:
+	-sudo killall sample_tcpserver
+	sleep 1
+
+sample_tcpclient_run:
+	$(OBJDIR)/sample_tcpclient -p$(SAMPLETCP_PORT) -i$(SAMPLETCP_IP)
+
+$(OBJDIR)/sample_tcpserver: sample_tcpserver.cc sample_tcpserver_main.cc $(OBJDIR)/$(TARGET)
+	$(CPP) -Wl,--start-group sample_tcpserver.cc sample_tcpserver_main.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+
+$(OBJDIR)/sample_tcpclient: sample_tcpclient.cc sample_tcpclient_main.cc $(OBJDIR)/$(TARGET)
+	$(CPP) -Wl,--start-group sample_tcpclient.cc sample_tcpclient_main.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+
+# ------------------------------------------------------ sample_signalhandler
+sample_signalhandler:
+	make BUILDTYPE=Debug all
+	make BUILDTYPE=Debug _sample_signalhandler
+_sample_signalhandler: $(OBJDIR)/sample_signalhandler
+
+sample_signalhandler_run: $(OBJDIR)/sample_signalhandler
+	$(OBJDIR)/sample_signalhandler
+
+$(OBJDIR)/sample_signalhandler : sample_signalhandler.cc
+	$(CPP) -Wl,--start-group sample_signalhandler.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+
+# ------------------------------------------------------ sample_try_exception
+sample_try_exception:
+	make BUILDTYPE=Debug all
+	make BUILDTYPE=Debug _sample_try_exception
+_sample_try_exception: $(OBJDIR)/sample_try_exception
+
+$(OBJDIR)/sample_try_exception : sample_try_exception.cc
+	$(CPP) -Wl,--start-group sample_try_exception.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+
+sample_try_exception_run:
+	-$(OBJDIR)/sample_try_exception
+	-$(OBJDIR)/sample_try_exception -r
+	-$(OBJDIR)/sample_try_exception -l
+	-$(OBJDIR)/sample_try_exception -b
+	-$(OBJDIR)/sample_try_exception -i
+	-$(OBJDIR)/sample_try_exception -o
+	-$(OBJDIR)/sample_try_exception -L
+	-$(OBJDIR)/sample_try_exception -O
+	-$(OBJDIR)/sample_try_exception -u
+	-$(OBJDIR)/sample_try_exception -d
+	-$(OBJDIR)/sample_try_exception -R
+	-$(OBJDIR)/sample_try_exception -c
+	-$(OBJDIR)/sample_try_exception -C
 
 
-.PHONY: all clean kill test archive server client objdir diff
-
-all: objdir $(TARGET)
-	@echo -----------------------------------------------
-	@echo -n '### source code total line count = '
-#	@cat *.c *.cc *.h | wc -l
-	@cat *.c *.cc *.h | wc -l
-	@echo -----------------------------------------------
-	make gtags
-	@echo -----------------------------------------------
-	make doxygen_generate
-
-objdir:
-	@mkdir -p $(CPPOBJDIR) $(COBJDIR)
-
-$(TARGET): $(COBJS) $(CPPOBJS)
-	$(CPP) -o $(TARGET) $(COBJS) $(CPPOBJS) $(LDFLAGS) $(LIBS)
+# ------------------------------------------------------ for me
+gcommit:
+	(cd ../; make gcommit)
+gpull:
+	(cd ../; make gpull)
 
 
-$(COBJS) $(CPPOBJS): Makefile
+-include $(OBJDIR)/*/*.d
 
-$(CPPOBJDIR)/%.o: %.cc
-	@[ -d $(CPPOBJDIR) ]
-	$(CPP) -o $@ -c $< $(CPPFLAGS)
-
-$(COBJDIR)/%.o: %.c
-	@[ -d $(COBJDIR) ]
-	$(CC) -o $@ -c $< $(CFLAGS)
-
-clean:
-	rm -rf $(OBJDIR) $(TARGET)
-distclean:
-	rm -rf $(OBJDIR) $(TARGET) build html latex rtf GPATH GRTAGS GTAGS
-
-test:
-	gdb $(TARGET)
-
-run:
-	./$(TARGET)
-
--include $(COBJDIR)/*.d
--include $(CPPOBJDIR)/*.d
-
-doxygen_generate: Doxyfile
-	if [ ! -f Doxyfile ] ; then \
-		make doxygen_create_template; \
-	fi
-	doxygen Doxyfile
-doxygen_create_doxyfile:
-	doxygen -g Doxyfile
-
-doxygen_check_doxyfile:
-	@doxygen -g Doxyfile_org > /dev/null
-	diff Doxyfile_org Doxyfile
-	rm -f Doxyfile_org
-
-gcommit gpush gpull gdiff gtags gtagsclean:
-	(cd ..; make $@)

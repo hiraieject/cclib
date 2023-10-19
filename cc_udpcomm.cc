@@ -1,3 +1,5 @@
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+
 #include "cc_udpcomm.h"
 
 // =====================================================================================
@@ -77,7 +79,7 @@ cc_udpsend::get_ip (struct in_addr &in) {
 }
 void cc_udpsend::get_ifinfo (struct ifreq &ifr) {
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , "eth0" , 30);
+	strcpy(ifr.ifr_name , "eth0");
 	ioctl(sock, SIOCGIFADDR, &ifr);
 }
 	
@@ -158,7 +160,7 @@ cc_udprecv::cc_udprecv (void) : cc_thread (true/*thread_up_flg*/,thread_func)
 
 cc_udprecv::~cc_udprecv ()
 {
-	// detache resource
+	// detach resource
 	disconnect ();
 	thread_down ();
 
@@ -236,7 +238,7 @@ cc_udprecv::get_ip (struct in_addr &in) {
 }
 void cc_udprecv::get_ifinfo (struct ifreq &ifr) {
 	ifr.ifr_addr.sa_family = AF_INET;
-	strncpy(ifr.ifr_name , "eth3" , 30);
+	strcpy(ifr.ifr_name , "eth3");
 	ioctl(sock, SIOCGIFADDR, &ifr);
 }
 

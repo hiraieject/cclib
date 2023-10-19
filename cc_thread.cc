@@ -1,122 +1,126 @@
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+
 #include "cc_thread.h"
 
-// =====================================================================================
-// ===================================================================================== THREAD
-// =====================================================================================
+/**
+ * @file cc_thread.cc
+ * @brief thread class for C++
+ */
 
-void *
-cc_thread::thread_func_template (void *arg)
-{
-	//　以下テンプレート、継承先のクラスでは　thread_func() で定義する
-
-	cc_thread *myobj = (cc_thread *)arg;
-	struct timeval timeout;
-	fd_set	rfds;
-
-	while (myobj->thread_loop) {
-        // タイムアウト値の設定
-        timeout.tv_sec	= 0;
-		timeout.tv_usec	= 200*1000;
-
-		FD_ZERO(&rfds);
-		FD_SET(myobj->fifo_to_thread->get_fd(), &rfds);
-		select(FD_SETSIZE, &rfds, 0, 0, &timeout);		// wait
-
-		if( FD_ISSET(myobj->fifo_to_thread->get_fd(), &rfds) ) {
-			int recvsize;
-			unsigned char buf[100];
-			recvsize = myobj->fifo_to_thread->recv (buf, sizeof(buf));
-			printf ("recv fifo event from main (%dbyte)\n", recvsize);
-		}
-	}
-	pthread_exit (NULL);
-	return NULL;
-}
+/// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
+#define CC_THREAD_ERRPR(fmt, args...) \
+	{ printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+/// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
+#define CC_THREAD_WARNPR(fmt, args...) \
+	{ printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+/// デバックプリント デバック表示用マクロ、enableのときだけ表示
+#define CC_THREAD_DBGPR(fmt, args...) \
+	if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 // -------------------------------------------------------------------------------------------
 
-cc_thread::cc_thread (bool thread_up_flg, void * (*start_routine)(void *))
+/**
+ * @brief コンストラクター
+ * @param nickname     ニックネーム文字列(デバックプリントで使用)
+ */
+cc_thread::cc_thread (key_t message_key, std::string nickname) :
+    thread_dbg (nickname),
+    message(message_key,nickname,true/*master_flag*/)
 {
-	CC_THREAD_DBGPR ("cc_thread: instance created\n");
+	CC_THREAD_DBGPR ("instance created\n");
 
 	// initialize
-	thread_id			= 0;;
-	thread_loop			= false;
+    {
+        std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+        thread_loop	    = false;
+        thread_enable   = false;
+        this->nickname  = nickname;
+    }
 
-	// create fifo
-	fifo_to_thread    = new cc_fifo ();
-	fifo_from_thread  = new cc_fifo ();
-	
-	// thread
-	if (thread_up_flg) {
-		thread_up (start_routine);
-	}
+    // debugprint をまとめてオンにする
+    //thread_dbg.enable();
 }
-
+/**
+ * @brief デストラクター
+ */
 cc_thread::~cc_thread ()
 {
-	thread_down ();
-
-	delete fifo_to_thread;
-	delete fifo_from_thread;
-
-	CC_THREAD_DBGPR ("cc_thread: instance deleted\n");
+    if (thread_enable) {
+        thread_down ();
+    }
+	CC_THREAD_DBGPR ("instance deleted\n");
 }
 
 // -------------------------------------------------------------------------------------------
-
+/**
+ * @brief thread_main のループ継続判定
+ * @return true: 継続, false: ループ終了
+ */
 bool
-cc_thread::thread_up (void * (*start_routine)(void *))
+cc_thread::loop_continue(void)
 {
-	if (thread_id == 0) {
-		// wakeup thread
-		thread_loop = true;
-		if (pthread_create (&thread_id, NULL, start_routine, (void*)this) != 0) {
-			thread_loop = false;
-			perror("cc_thread: pthread_create() error");
-			return false;
-		}
-		// joinするので、detachしない
-		//pthread_detach (thread_id);
-	}
-	return true;
+    std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+    return thread_loop == true;
+}
+/**
+ * @brief thread_main のループ継続判定の設定関数
+ * @param enb true: 継続, false: ループ終了
+ */
+void
+cc_thread::set_loop_continue(bool enb)
+{
+    std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+    thread_loop = enb;
 }
 
-bool
+/**
+ * @brief スレッド起動
+ */
+void
+cc_thread::thread_up (void)
+{
+	if (thread_enable == false) {
+		// wakeup thread
+        CC_THREAD_DBGPR ("now wakeup thread\n");
+        {
+            std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+            thread_loop     = true;
+            thread_enable   = true;
+        }
+        thread_obj = std::thread([this]() {this->thread_main();}); // ラムダ式経由でスレッド関数を呼ぶ
+    }
+}
+
+/**
+ * @brief スレッド停止
+ */
+void
 cc_thread::thread_down(void)
 {
-	if (thread_id != 0) {
-		thread_loop = false;
-
-		CC_THREAD_DBGPR ("start pthread join\n");
-		pthread_join (thread_id, NULL);
-		CC_THREAD_DBGPR ("success pthread join\n");
-
-		thread_id = 0;
-	}
-	return true;
+    {
+        std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+        if (thread_enable == true) {
+            CC_THREAD_DBGPR ("change thread loop to disable\n");
+            thread_enable = false;
+            thread_loop   = false;
+        }
+    }
+    if (thread_obj.joinable()) {
+        CC_THREAD_DBGPR ("start thread join\n");
+        thread_obj.join ();
+        CC_THREAD_DBGPR ("success thread join\n");
+    }
 }
 
-// -------------------------------------------------------------------------------------------
-
-int
-cc_thread::send_to_thread (void *dptr, int dsize)
+/**
+ * @brief デタッチ処理
+ * この関数を呼ぶと、スレッド停止時にJOIN待ちしなくなる
+ */
+void
+cc_thread::thread_detach (void)
 {
-	return fifo_to_thread->send (dptr, dsize);
-}
-int
-cc_thread::recv_to_thread (void *bptr, int bsize)
-{
-	return fifo_to_thread->recv (bptr, bsize);
+    thread_obj.detach();
+    CC_THREAD_DBGPR ("thread detached\n");
 }
 
-int
-cc_thread::send_from_thread (void *dptr, int dsize)
-{
-	return fifo_from_thread->send (dptr, dsize);
-}
-int
-cc_thread::recv_from_thread (void *bptr, int bsize)
-{
-	return fifo_from_thread->recv (bptr, bsize);
-}
+

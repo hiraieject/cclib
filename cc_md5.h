@@ -1,7 +1,7 @@
-/* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
 /*
- * MD5 class for C++  by hirai
+ * MD5 class for C++
  */
 
 #ifndef __CC_MD5_H__

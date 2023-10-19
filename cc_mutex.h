@@ -1,8 +1,8 @@
-/* -*- Mode: C; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
 /**
- * @file wb_mutex.h
- * @brief mutex class for C++  by hirai
+ * @file cc_mutex.h
+ * @brief mutex class for C++
  */
 
 #ifndef __CC_MUTEX_H__
@@ -27,15 +27,15 @@
 #undef CC_MUTEX_ERRPR
 #undef CC_MUTEX_WARNPR
 #define CC_MUTEX_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+	{ printf(" [CC_MUTEX:%s():%d] ##### ERROR!: " fmt,__FUNCTION__,__LINE__, ## args); }
 #define CC_MUTEX_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt, __FILE__,__FUNCTION__,__LINE__, ## args); }
+	{ printf(" [CC_MUTEX:%s():%d] ##### WARNING!: " fmt,__FUNCTION__,__LINE__, ## args); }
 
 #if !defined(CC_MUTEX_ENB_DBGPR)
 #define CC_MUTEX_DBGPR(fmt, args...)
 #else 
 #define CC_MUTEX_DBGPR(fmt, args...)	\
-	{ printf("[%s:%s():%d] " fmt, __FILE__,__FUNCTION__,__LINE__,## args); }
+	{ printf(" [CC_MUTEX:%s():%d] " fmt,__FUNCTION__,__LINE__,## args); }
 #endif
 
 ///
