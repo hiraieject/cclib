@@ -12,27 +12,56 @@ CCSRCS  += cc_tcpcomm.cc
 CPPSRCS += 
 TARGET   = cclib.a
 
-LDFLAGS   += -lpthread
+#LDFLAGS   += -lpthread
+
+# ------------------------------------------------------
+SUBDIRS = 
+
+build release:
+	@echo "========================="
+	@echo "=  start release build  ="
+	@echo "========================="
+#	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i all; done
+	make all
+#	make install
+#	make gtags
+
+debug:
+	@echo "======================="
+	@echo "=  start debug build  ="
+	@echo "======================="
+#	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i BUILDTYPE=Debug all; done
+	make BUILDTYPE=Debug all
+#	make install
+	make gtags
+
+install:
+
+gtags:
+gtags_clean:
 
 # ------------------------------------------------------
 .PHONY: all clean distclean install
 .PHONY: unittest_all unittest_clean unittest_distclean
 
+
+
 all unittest_all:
 	@make mkobjdir
 	make $(OBJDIR)/$(TARGET)
 
-$(OBJS): Makefile ../../conf/makefile.inc
+$(OBJS): Makefile $(BUILD_TOP_DIR)/conf/makefile.inc
 
 $(OBJDIR)/$(TARGET): $(OBJS)
 	$(AR) rcs $@ $(OBJS)
 
 clean unittest_clean distclean unittest_distclean:
-	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
+#	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
 	@make cleanobjdir
+	make gtags_clean
 
 install:
-	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
+#	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
 
 # ------------------------------------------------------ sample_tcpserver/client
 SAMPLETCP_PORT = 5000
