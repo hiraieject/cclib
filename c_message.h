@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 
-#include "cc_custom_def.h"
 #include "cc_message_def.h"
 
 #ifdef __cplusplus
