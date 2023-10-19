@@ -1,5 +1,15 @@
 /* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
+/**
+ * @file cc_message.cc
+ * @brief message send/recv class for C++
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
+ */
+
 #include <sys/msg.h>            // for IPC_CREAT etc
 #include <fcntl.h>              // for O_RDWR etc
 #include <unistd.h>             // for open/close etc

@@ -1,5 +1,14 @@
 /* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
+/**
+ * @file cc_tcpcomm.h
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
+ */
+
 #include "cc_tcpcomm.h"
 
 

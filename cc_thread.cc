@@ -1,11 +1,16 @@
 /* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
 
-#include "cc_thread.h"
-
 /**
  * @file cc_thread.cc
  * @brief thread class for C++
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
+
+#include "cc_thread.h"
 
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_ERRPR(fmt, args...) \

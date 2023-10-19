@@ -3,6 +3,11 @@
 /**
  * @file cc_jaction.h
  * @brief test core class
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
 
 #ifndef __CC_JACTION_H__

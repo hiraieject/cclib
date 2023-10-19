@@ -3,6 +3,11 @@
 /**
  * @file c_message.h
  * @brief message send/recv class for C
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
 
 #ifndef __C_MESSAGE_H__

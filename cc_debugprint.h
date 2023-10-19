@@ -3,6 +3,11 @@
 /**
  * @file cc_debugprint.h
  * @brief デバックプリント制御
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
 
 #ifndef __CC_DEBUGPRINT_H__

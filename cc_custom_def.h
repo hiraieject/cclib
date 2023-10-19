@@ -3,6 +3,11 @@
 /**
  * @file cc_custom_def.h
  * @brief project custom defines
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
 
 #ifndef __CC_CUSTOM_DEF_H__

@@ -3,6 +3,11 @@
 /**
  * @file cc_message_def.h
  * @brief c/c++ common message definition 
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
  */
 
 #ifndef __C_MESSAGE_def_H__
