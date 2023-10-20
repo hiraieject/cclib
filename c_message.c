@@ -134,16 +134,16 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
     char *p;
     send_packet.com = COM_COMMON_JSON;
     p = stpncpy (send_packet.sender, sender,
-                 SENDERNAME_MAXLEN);
+                 CC_MESSAGE_SENDERNAME_MAXLEN);
     *p = '\0'; // 終端
 
     p = stpncpy (send_packet.reciever, reciever,
-                 RECIEVERNAME_MAXLEN);
+                 CC_MESSAGE_RECIEVERNAME_MAXLEN);
     *p = '\0'; // 終端
 
     p = stpncpy (send_packet.json_str,
                  send_json_str,
-                 JSON_MAXLEN);
+                 CC_MESSAGE_JSON_MAXLEN);
     *p = '\0'; // 終端
 
     // 返信FIFOを作成してオープン
