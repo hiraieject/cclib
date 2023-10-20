@@ -1,3 +1,14 @@
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
+
+/**
+ * @file cclib.h
+ * @brief header for user application
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
+ */
 
 #ifndef __CCLIB_H__
 #define __CCLIB_H__

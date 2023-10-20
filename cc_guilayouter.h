@@ -1,3 +1,18 @@
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
+
+/**
+ * @file cc_guilayouter.h
+ * @brief デバックプリント制御
+ * 
+ * Copyright (c) 2023 Yoshikazu Hirai
+ * Released under the MIT license
+ * https://opensource.org/licenses/mit-license.php
+ * 
+ */
+
+// #####################################################################################
+// ###############################  under construction   ###############################
+// #####################################################################################
 
 #ifndef __GUI_LAYOUTER_H__
 #define __GUI_LAYOUTER_H__

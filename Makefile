@@ -59,9 +59,35 @@ clean unittest_clean distclean unittest_distclean:
 #	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
 	@make cleanobjdir
 	make gtags_clean
+	make doxygen_clean
 
 install:
 #	set -e; for i in $(SUBDIRS); do $(MAKE) -C $$i $@; done
+
+# ------------------------------------------------------ document
+doxygen_generate: Doxyfile
+	if [ ! -f Doxyfile ] ; then \
+		make doxygen_create_doxyfile; \
+	fi
+	make doxygen_clean
+	doxygen Doxyfile
+doxygen_create_doxyfile:
+	doxygen -g Doxyfile
+
+doxygen_check_doxyfile:
+	@doxygen -g Doxyfile_org > /dev/null
+	diff Doxyfile_org Doxyfile
+	rm -f Doxyfile_org
+
+doxygen_clean:
+	(cd doc; rm -rf cclib_document_html)
+# ------------------------------------------------------ install packages
+install_packages:
+	sudo apt update
+	sudo apt -y install nlohmann-json3-dev
+	sudo apt -y install libwebsocketpp-dev
+	sudo apt -y install libboost-all-dev
+	sudo apt -y install doxygen graphviz texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
 # ------------------------------------------------------ sample_tcpserver/client
 SAMPLETCP_PORT = 5000

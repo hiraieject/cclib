@@ -25,7 +25,8 @@ extern "C" {
 #endif /* __cplusplus */
 
 // ---------------------------------------------------------------- new API
-// 文字列を送信し、必要なら返信を返す
+// JSON文字列を送信し、必要なら返信を返す
+// 　スレッドフリーではないので、必要なら呼ぶ側でmutexで囲むなどしてください
 bool send_json (bool reply_required, char *sender, char *reciever, int reciever_key, char *send_json_str, char **reply_json_str);
 
 void json_add_property(char *json_str, const char *key, const char *value);
