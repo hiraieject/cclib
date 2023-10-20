@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_message.cc
@@ -19,13 +19,13 @@
 
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_MESSAGE_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 /// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
 #define CC_MESSAGE_WARNPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 /// デバックプリント デバック表示用マクロ、enableのときだけ表示
 #define CC_MESSAGE_DBGPR(fmt, args...) \
-	if (message_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (message_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 
 cc_message_base::cc_message_base (std::string nickname)
@@ -153,7 +153,7 @@ cc_message::send_json (nlohmann::json &send_json_obj)
 
         // select() でイベント待ち
         struct timeval timeout = { 5/*sec*/, 0/*usec*/ };
-        fd_set	rfds;
+        fd_set  rfds;
         FD_ZERO(&rfds);
         FD_SET(reply_fd, &rfds);
         CC_MESSAGE_DBGPR ("select wait start\n");

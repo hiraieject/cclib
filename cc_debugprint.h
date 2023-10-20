@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_debugprint.h
@@ -46,10 +46,10 @@ public:
     std::string nickname;                       ///< デバックプリントで表示するニックネーム
 };
 #define ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 #define WARNPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 #define DBGPR(fmt, args...) \
-	if (dbg.enable_flg) { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (dbg.enable_flg) { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 #endif // __CC_DEBUGPRINT_H__

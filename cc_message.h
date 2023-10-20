@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_message.h
@@ -32,7 +32,7 @@ public:
 class cc_message_base {
 private:
 public:
-	cc_message_base (std::string nickname);
+    cc_message_base (std::string nickname);
     virtual ~cc_message_base ();
 
     // ----------------------------------------------- API for reciever
@@ -65,7 +65,7 @@ private:
     void destroy_fifo (int qid);
 
     public:
-	cc_message (key_t send_key, std::string nickname, bool master_falg);
+    cc_message (key_t send_key, std::string nickname, bool master_falg);
     ~cc_message ();
 
     // ----------------------------------------------- API for reciever

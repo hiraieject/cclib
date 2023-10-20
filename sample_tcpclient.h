@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 #ifndef __SAMPLE_TCPCLIENT_H__
 #define __SAMPLE_TCPCLIENT_H__

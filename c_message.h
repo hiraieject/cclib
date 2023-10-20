@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file c_message.h

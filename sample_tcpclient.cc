@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 #include "sample_tcpclient.h"
 
@@ -8,15 +8,15 @@ void
 sample_tcpclient_recv::thread_main (void)
 {
     struct timeval timeout;
-    fd_set	readSet;
+    fd_set  readSet;
     
     printf ("sample_tcpclient_recv: thread up\n");
     
     while (loop_continue()) {
 
         // タイムアウト設定
-        timeout.tv_sec	= 0;
-        timeout.tv_usec	= 1000*1000; // 1sec loop
+        timeout.tv_sec  = 0;
+        timeout.tv_usec = 1000*1000; // 1sec loop
 
         // 待受対象
         FD_ZERO(&readSet);

@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_thread.h
@@ -30,7 +30,7 @@
 class cc_thread {
 protected:
     std::thread thread_obj;                     ///< class thread のインスタンス
-	bool thread_loop;							///< スレッドループ有効フラグ、falseにするとスレッドループを抜ける
+    bool thread_loop;                           ///< スレッドループ有効フラグ、falseにするとスレッドループを抜ける
     bool thread_enable;                         ///< スレッド起動中フラグ
     std::mutex mtx;                             ///< cc_threadが保持する変数保護用
 
@@ -39,7 +39,7 @@ protected:
     
 public:
     // public functions
-	cc_thread (key_t message_key, std::string nickname);           // コンストラクター
+    cc_thread (key_t message_key, std::string nickname);           // コンストラクター
     ~cc_thread ();                              // デストラクター
 
     void set_loop_continue(bool enb);           // ループ継続判定設定

@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 #include "sample_tcpserver.h"
 
@@ -7,15 +7,15 @@ void
 sample_tcpserver_conn::thread_main (void)
 {
     struct timeval timeout;
-    fd_set	readSet;
+    fd_set  readSet;
 
     DBGPR ("cc_tcpserver_conn: thread up\n");
     
     while (loop_continue()) {
 
         // タイムアウト設定
-        timeout.tv_sec	= 0;
-        timeout.tv_usec	= 100*1000; // 100msec loop
+        timeout.tv_sec  = 0;
+        timeout.tv_usec = 100*1000; // 100msec loop
 
         // 待受対象
         FD_ZERO(&readSet);

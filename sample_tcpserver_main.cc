@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 #include <iostream>
 #include <chrono>
@@ -86,7 +86,7 @@ main (int argc, char *argv[])
 
     // サーバー実行
     printf ("now wakeup server\n");
-	if (server.start_server (port_no, connect_max) == false) {
+    if (server.start_server (port_no, connect_max) == false) {
         printf ("ERROR: detect server start failed, process exit now.\n");
         return 1;
     }

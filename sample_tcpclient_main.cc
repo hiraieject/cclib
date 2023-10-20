@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 #include <iostream>
 #include <chrono>
@@ -81,7 +81,7 @@ main (int argc, char *argv[])
 
     // サーバーに接続
     printf ("now wakeup server\n");
-	if (client_recv.exec_server_connect (port_no, (const char*)ip_addr) == false) {
+    if (client_recv.exec_server_connect (port_no, (const char*)ip_addr) == false) {
         printf("ERROR: failed connect server, process exit now.\n");
         return 1;
     }

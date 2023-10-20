@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_message_def.h
@@ -40,8 +40,8 @@ enum {
 typedef struct message_packet {
     // basic only
     int  com;                 //< q command   : must not 0
-	int  rqid;                //< reply qid   : -1:invalid, other:valid
-	int  result;              //< result core : 0:OK, other:NG
+    int  rqid;                //< reply qid   : -1:invalid, other:valid
+    int  result;              //< result core : 0:OK, other:NG
     char sender[CC_MESSAGE_SENDERNAME_MAXLEN+1];
     char reciever[CC_MESSAGE_RECIEVERNAME_MAXLEN+1];
     char json_str[CC_MESSAGE_JSON_MAXLEN+1];  ///< JSON 文字列

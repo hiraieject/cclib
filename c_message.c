@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file c_message.c
@@ -30,11 +30,11 @@
 
 // ------------------------------------------------------- debug print macro
 #define CC_MESSAGE_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt,"c_message",__FUNCTION__,__LINE__, ## args); }
-#define CC_MESSAGE_WARNPR(fmt, args...)											\
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt,"c_message",__FUNCTION__,__LINE__, ## args); }
-#define CC_MESSAGE_DBGPR(fmt, args...)	\
-	if (enable_dbgpr) { printf("[%s:%s():%d] " fmt,"c_message",__FUNCTION__,__LINE__,## args); }
+        { printf("[%s:%s():%d] ##### ERROR!: " fmt,"c_message",__FUNCTION__,__LINE__, ## args); }
+#define CC_MESSAGE_WARNPR(fmt, args...)                                                                                 \
+        { printf("[%s:%s():%d] ##### WARNING!: " fmt,"c_message",__FUNCTION__,__LINE__, ## args); }
+#define CC_MESSAGE_DBGPR(fmt, args...)  \
+        if (enable_dbgpr) { printf("[%s:%s():%d] " fmt,"c_message",__FUNCTION__,__LINE__,## args); }
 // -------------------------------------------------------
 
 #define ENABLE_SENDLOG 1
@@ -195,7 +195,7 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
 
     // select() でイベント待ち
     struct timeval timeout = { 5/*sec*/, 0/*usec*/ };
-    fd_set	rfds;
+    fd_set      rfds;
     FD_ZERO(&rfds);
     FD_SET(reply_fd, &rfds);
     CC_MESSAGE_DBGPR ("select wait start\n");
@@ -559,7 +559,7 @@ c_message_recv_reply (c_message *cm, void *reply_buffer, void *sended_message)
     }
     // select() でイベント待ち
     struct timeval timeout = { 3/*sec*/, 0/*usec*/ };
-    fd_set	rfds;
+    fd_set      rfds;
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
     CC_MESSAGE_DBGPR ("select wait start\n");

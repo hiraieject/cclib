@@ -1,4 +1,4 @@
-/* -*- Mode: C++; tab-width: 4; c-basic-offset: 4 -*- */
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
 
 /**
  * @file cc_thread.cc
@@ -14,13 +14,13 @@
 
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_ERRPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 /// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_WARNPR(fmt, args...) \
-	{ printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 /// デバックプリント デバック表示用マクロ、enableのときだけ表示
 #define CC_THREAD_DBGPR(fmt, args...) \
-	if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 // -------------------------------------------------------------------------------------------
 
@@ -32,12 +32,12 @@ cc_thread::cc_thread (key_t message_key, std::string nickname) :
     thread_dbg (nickname),
     message(message_key,nickname,true/*master_flag*/)
 {
-	CC_THREAD_DBGPR ("instance created\n");
+    CC_THREAD_DBGPR ("instance created\n");
 
-	// initialize
+    // initialize
     {
         std::lock_guard<std::mutex> lock(mtx); // mutexをロック
-        thread_loop	    = false;
+        thread_loop     = false;
         thread_enable   = false;
         this->nickname  = nickname;
     }
@@ -53,7 +53,7 @@ cc_thread::~cc_thread ()
     if (thread_enable) {
         thread_down ();
     }
-	CC_THREAD_DBGPR ("instance deleted\n");
+    CC_THREAD_DBGPR ("instance deleted\n");
 }
 
 // -------------------------------------------------------------------------------------------
@@ -84,8 +84,8 @@ cc_thread::set_loop_continue(bool enb)
 void
 cc_thread::thread_up (void)
 {
-	if (thread_enable == false) {
-		// wakeup thread
+    if (thread_enable == false) {
+        // wakeup thread
         CC_THREAD_DBGPR ("now wakeup thread\n");
         {
             std::lock_guard<std::mutex> lock(mtx); // mutexをロック
