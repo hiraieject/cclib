@@ -152,12 +152,8 @@ sample_try_exception_run:
 	-$(OBJDIR)/sample_try_exception -C
 
 
-# ------------------------------------------------------ for me
-gcommit:
-	(cd ../; make gcommit)
-gpull:
-	(cd ../; make gpull)
-
-
 -include $(OBJDIR)/*/*.d
+
+# ------------------------------------------------------ for me
+-include ~/.dotfiles/.makefile.gitbase.inc
 
