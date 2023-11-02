@@ -188,12 +188,18 @@ std::string
 cc_message::send_json (bool reply_required, std::string sender, std::string send_json_str)
 {
     nlohmann::json send_json_obj = nlohmann::json::parse(send_json_str);
+    return send_json (reply_required, sender, send_json_obj);
+}
+std::string
+cc_message::send_json (bool reply_required, std::string sender, nlohmann::json &send_json_obj)
+{
     send_json_obj["sender"]   = sender;
     send_json_obj["reciever"] = nickname;
     send_json_obj["reply_required"] = reply_required;
     
     return send_json (send_json_obj);
 }
+
 
 int
 cc_message::open_fifo (int qid, int option)

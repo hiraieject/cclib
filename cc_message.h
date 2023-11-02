@@ -64,7 +64,7 @@ private:
     void close_fifo (int fd);
     void destroy_fifo (int qid);
 
-    public:
+public:
     cc_message (key_t send_key, std::string nickname, bool master_falg);
     ~cc_message ();
 
@@ -75,6 +75,7 @@ private:
     // ----------------------------------------------- API for sender
     std::string send_json (nlohmann::json &send_json_obj);
     std::string send_json (bool reply_required, std::string sender, std::string send_json_str);
+    std::string send_json (bool reply_required, std::string sender, nlohmann::json &send_json_obj);
 };
 
 #endif // __CC_MESSAGE_H__
