@@ -24,6 +24,8 @@
 class cc_pipeexec {
 public:
     std::vector<std::string> outputLines;
+    bool outputModified;
+    std::mutex mtx;                     ///< 変数保護用MUTEX @n 変数を直接参照する時にはロックすること
 
     std::vector<std::string> executeCommand(const char* cmd)
     {
@@ -33,7 +35,11 @@ public:
         FILE *fp;
 
         // 配列を初期化する
-        outputLines.clear();
+        {
+            std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+            outputLines.clear();
+            outputModified = false;
+        }
 
         if (pipe(pipes) == -1) {
             throw std::runtime_error("PIPEの作成に失敗しました");
@@ -98,7 +104,11 @@ public:
 
             if( (fp = fdopen(pipes[0], "r")) != NULL ) { // 読み込みパイプ
                 while( fgets(buf, sizeof(buf), fp) != NULL ) {
-                    outputLines.push_back(buf);
+                    {
+                        std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+                        outputLines.push_back(buf);
+                        outputModified = true;
+                    }
                 }
                 fclose(fp);
             }
