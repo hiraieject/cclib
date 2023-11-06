@@ -22,9 +22,10 @@
 #include <string.h>
 
 class cc_pipeexec {
-public:
-    std::vector<std::string> outputLines;
+private:
     bool outputModified;
+    std::vector<std::string> outputLines;
+public:
     std::mutex mtx;                     ///< 変数保護用MUTEX @n 変数を直接参照する時にはロックすること
 
     std::vector<std::string> executeCommand(const char* cmd)
@@ -115,6 +116,14 @@ public:
             close(pipes[0]);
         }
         return outputLines;
+    }
+
+    bool get_output(std::vector<std::string> &output)
+    {
+        std::lock_guard<std::mutex> lock(mtx); // mutexをロック
+        bool ret = outputModified;
+        output = outputLines;
+        return ret;
     }
 
     int calltest(void)
