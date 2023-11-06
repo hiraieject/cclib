@@ -9,6 +9,7 @@ CCSRCS  += cc_message.cc
 CCSRCS  += cc_thread.cc
 CCSRCS  += cc_tcpcomm.cc
 # CCSRCS  += cc_udpcomm.cc
+CCSRCS  += cc_misc.cc
 CPPSRCS += 
 TARGET   = cclib.a
 

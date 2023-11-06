@@ -62,13 +62,13 @@ cc_message::~cc_message ()
 }
 
 int
-cc_message::reciever_get_fd (void)
+cc_message::receiver_get_fd (void)
 {
     return send_fd;
 }
 
 std::string
-cc_message::reciever_recv_json_str (void)
+cc_message::receiver_recv_json_str (void)
 {
     std::string json_str;
     
@@ -119,9 +119,9 @@ cc_message::send_json (nlohmann::json &send_json_obj)
         p = stpncpy (packet.sender, sender.c_str(),
                      CC_MESSAGE_SENDERNAME_MAXLEN);
         *p = '\0'; // 終端
-        std::string reciever = send_json_obj["reciever"];
-        p = stpncpy (packet.reciever, reciever.c_str(),
-                     CC_MESSAGE_RECIEVERNAME_MAXLEN);
+        std::string receiver = send_json_obj["receiver"];
+        p = stpncpy (packet.receiver, receiver.c_str(),
+                     CC_MESSAGE_RECEIVERNAME_MAXLEN);
         *p = '\0'; // 終端
         p = stpncpy (packet.json_str,
                      send_json_obj.dump().c_str(),
@@ -131,7 +131,7 @@ cc_message::send_json (nlohmann::json &send_json_obj)
         // メッセージを送信
 #if defined(ENABLE_SENDLOG)
         CC_MESSAGE_DBGPR ("now send message [%s -> %s]\n",
-                          packet.sender, packet.reciever);
+                          packet.sender, packet.receiver);
 #endif
         int ret = write (send_fd, (void*)&packet, sizeof(packet)); // 送信
         if (ret == -1) {
@@ -194,7 +194,7 @@ std::string
 cc_message::send_json (bool reply_required, std::string sender, nlohmann::json &send_json_obj)
 {
     send_json_obj["sender"]   = sender;
-    send_json_obj["reciever"] = nickname;
+    send_json_obj["receiver"] = nickname;
     send_json_obj["reply_required"] = reply_required;
     
     return send_json (send_json_obj);

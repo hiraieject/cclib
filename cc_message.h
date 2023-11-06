@@ -19,8 +19,8 @@
 #include "cc_debugprint.h"
 
 
-#define MKSENDSTR(_sender,_reciever,_json_str)                            \
-    (R"({"sender":")" _sender R"(","reciever":")" _reciever R"(",)" _json_str R"(})")
+#define MKSENDSTR(_sender,_receiver,_json_str)                            \
+    (R"({"sender":")" _sender R"(","receiver":")" _receiver R"(",)" _json_str R"(})")
     
 
 class cc_message_data {
@@ -35,9 +35,9 @@ public:
     cc_message_base (std::string nickname);
     virtual ~cc_message_base ();
 
-    // ----------------------------------------------- API for reciever
-    virtual int reciever_get_fd (void) {return -1;};
-    virtual std::string reciever_recv_json_str (void) {return "";};
+    // ----------------------------------------------- API for receiver
+    virtual int receiver_get_fd (void) {return -1;};
+    virtual std::string receiver_recv_json_str (void) {return "";};
 
     // ----------------------------------------------- API for sender
     std::string send_json (nlohmann::json &send_json_obj) {return "";};
@@ -68,9 +68,9 @@ public:
     cc_message (key_t send_key, std::string nickname, bool master_falg);
     ~cc_message ();
 
-    // ----------------------------------------------- API for reciever
-    int reciever_get_fd (void);
-    std::string reciever_recv_json_str (void);
+    // ----------------------------------------------- API for receiver
+    int receiver_get_fd (void);
+    std::string receiver_recv_json_str (void);
 
     // ----------------------------------------------- API for sender
     std::string send_json (nlohmann::json &send_json_obj);

@@ -18,6 +18,7 @@
 #include "cc_pipeexec.h"
 #include "cc_tcpcomm.h"
 #include "cc_api.h"
+#include "cc_misc.h"
 //#include "cc_md5.h"
 //#include "cc_mutex.h"
 //#include "cc_udpcomm.h"

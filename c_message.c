@@ -100,7 +100,7 @@ static message_packet send_packet;              // でかいかもなのでス�
 static message_packet reply_packet;
 
 bool
-send_json (bool reply_required, char *sender, char *reciever, int reciever_key, char *send_json_str, char **reply_json_str)
+send_json (bool reply_required, char *sender, char *receiver, int receiver_key, char *send_json_str, char **reply_json_str)
 {
     bool ret_bool = false;
     int reply_qid = -1;
@@ -110,15 +110,15 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
     *reply_json_str = (char*)"";
 
     // FIFO オープン
-    int reciever_qid = msgget (reciever_key , 0666 | IPC_CREAT);
-    if (reciever_qid == -1) {
+    int receiver_qid = msgget (receiver_key , 0666 | IPC_CREAT);
+    if (receiver_qid == -1) {
         perror("msgget()");
-        ERRPR ("message reciever qid create error\n");
+        ERRPR ("message receiver qid create error\n");
         goto FINISH;
     }
     // 既存のFIFOをオープン、FIFOファイルがなければエラーになる
     char fifoname[128];
-    snprintf(fifoname, sizeof(fifoname), "/tmp/fifo.%d", reciever_qid);
+    snprintf(fifoname, sizeof(fifoname), "/tmp/fifo.%d", receiver_qid);
     if ((send_fd = open (fifoname, O_WRONLY|O_NONBLOCK)) == -1) {
         ERRPR("send fifo open error, filename=%s\n", fifoname);
         perror("open()");
@@ -137,8 +137,8 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
                  CC_MESSAGE_SENDERNAME_MAXLEN);
     *p = '\0'; // 終端
 
-    p = stpncpy (send_packet.reciever, reciever,
-                 CC_MESSAGE_RECIEVERNAME_MAXLEN);
+    p = stpncpy (send_packet.receiver, receiver,
+                 CC_MESSAGE_RECEIVERNAME_MAXLEN);
     *p = '\0'; // 終端
 
     p = stpncpy (send_packet.json_str,
@@ -159,7 +159,7 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
         json_add_property(send_packet.json_str, "reply_qid", reply_qid_str);
 
         // FIFO作成
-        snprintf(fifoname, sizeof(fifoname), "/tmp/fifo.%d", reciever_qid);
+        snprintf(fifoname, sizeof(fifoname), "/tmp/fifo.%d", receiver_qid);
         if (access(fifoname,F_OK) != 0) {
             // fifoファイルがない場合、fifoを新規に作成する
             if ((mkfifo(fifoname, 0666) < 0) && (errno != EEXIST)) {
@@ -180,7 +180,7 @@ send_json (bool reply_required, char *sender, char *reciever, int reciever_key, 
     // メッセージを送信
 #if defined(ENABLE_SENDLOG)
     DBGPR ("now send message [%s -> %s]\n",
-                      send_packet.sender, send_packet.reciever);
+                      send_packet.sender, send_packet.receiver);
 #endif
     int ret = write (send_fd, (void*)&send_packet, sizeof(send_packet)); // 送信
     if (ret == -1) {

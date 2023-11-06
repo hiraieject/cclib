@@ -34,7 +34,7 @@ enum {
 };
 
 #define CC_MESSAGE_SENDERNAME_MAXLEN 15
-#define CC_MESSAGE_RECIEVERNAME_MAXLEN 15
+#define CC_MESSAGE_RECEIVERNAME_MAXLEN 15
 #define CC_MESSAGE_JSON_MAXLEN 400
 
 typedef struct message_packet {
@@ -43,7 +43,7 @@ typedef struct message_packet {
     int  rqid;                //< reply qid   : -1:invalid, other:valid
     int  result;              //< result core : 0:OK, other:NG
     char sender[CC_MESSAGE_SENDERNAME_MAXLEN+1];
-    char reciever[CC_MESSAGE_RECIEVERNAME_MAXLEN+1];
+    char receiver[CC_MESSAGE_RECEIVERNAME_MAXLEN+1];
     char json_str[CC_MESSAGE_JSON_MAXLEN+1];  ///< JSON 文字列
 } message_packet;
 
