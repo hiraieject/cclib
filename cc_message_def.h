@@ -35,7 +35,7 @@ enum {
 
 #define CC_MESSAGE_SENDERNAME_MAXLEN 15
 #define CC_MESSAGE_RECEIVERNAME_MAXLEN 15
-#define CC_MESSAGE_JSON_MAXLEN 400
+#define CC_MESSAGE_JSON_MAXLEN 2000
 
 typedef struct message_packet {
     // basic only
