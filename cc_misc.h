@@ -19,11 +19,14 @@
 bool cc_checkConnection(const std::string& hostname, int port, int timeout);
 
 enum class cc_SortOrder {
-    None,      // ソートなし
-    Ascending, // 昇順
-    Descending // 降順
+    None,            // ソートなし
+    Ascending,       // 昇順
+    Descending,      // 降順
+    DateAscending,   // 日付昇順
+    DateDescending   // 日付降順
 };
 void cc_getFilelist (const std::string& dir_path, std::vector<std::string>& filelist, int maxfiles, const std::string &extention, cc_SortOrder order = cc_SortOrder::None);
+void cc_getFolderlist (const std::string& dir_path, std::vector<std::string>& folderlist, int maxfolders, cc_SortOrder order);
 
 std::string cc_readFileBody(const std::string& filename);
 

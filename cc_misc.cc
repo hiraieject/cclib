@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netdb.h>
@@ -50,7 +51,6 @@ cc_checkTcpConnection(const std::string& hostname, int port, int timeout)
     return ret;
 }
 
-
 void
 cc_getFilelist (const std::string& dir_path, std::vector<std::string>& filelist, int maxfiles, const std::string &extention, cc_SortOrder order)
 {
@@ -76,6 +76,69 @@ cc_getFilelist (const std::string& dir_path, std::vector<std::string>& filelist,
         std::sort(filelist.begin(), filelist.end());
     } else if (order == cc_SortOrder::Descending) {
         std::sort(filelist.begin(), filelist.end(), std::greater<std::string>());
+    } else if (order == cc_SortOrder::DateAscending) {
+        // 日付昇順にソート
+        std::sort(filelist.begin(), filelist.end(), [](const std::string& a, const std::string& b) {
+            struct stat statA, statB;
+            stat(a.c_str(), &statA);
+            stat(b.c_str(), &statB);
+            return statA.st_mtime < statB.st_mtime;
+        });
+    } else if (order == cc_SortOrder::DateDescending) {
+        // 日付降順にソート
+        std::sort(filelist.begin(), filelist.end(), [](const std::string& a, const std::string& b) {
+            struct stat statA, statB;
+            stat(a.c_str(), &statA);
+            stat(b.c_str(), &statB);
+            return statA.st_mtime > statB.st_mtime;
+        });
+    }
+}
+
+void
+cc_getFolderlist (const std::string& dir_path, std::vector<std::string>& folderlist, int maxfolders, cc_SortOrder order)
+{
+    DIR* dir = opendir(dir_path.c_str());
+    struct dirent* entry;
+    if (dir == nullptr) {
+        return;
+    }
+    int count = 0;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (entry->d_type == DT_DIR) {
+            std::string foldername(entry->d_name);
+            // '.' または '..' のエントリは無視する
+            if (foldername != "." && foldername != "..") {
+                folderlist.push_back(foldername);
+            }
+        }
+        if (++count > maxfolders) {
+            break;              // 最大数リミッター
+        }
+    }
+    closedir(dir);
+
+    // ソート順に基づいてリストをソート
+    if (order == cc_SortOrder::Ascending) {
+        std::sort(folderlist.begin(), folderlist.end());
+    } else if (order == cc_SortOrder::Descending) {
+        std::sort(folderlist.begin(), folderlist.end(), std::greater<std::string>());
+    } else if (order == cc_SortOrder::DateAscending) {
+        // 日付昇順にソート
+        std::sort(folderlist.begin(), folderlist.end(), [](const std::string& a, const std::string& b) {
+            struct stat statA, statB;
+            stat(a.c_str(), &statA);
+            stat(b.c_str(), &statB);
+            return statA.st_mtime < statB.st_mtime;
+        });
+    } else if (order == cc_SortOrder::DateDescending) {
+        // 日付降順にソート
+        std::sort(folderlist.begin(), folderlist.end(), [](const std::string& a, const std::string& b) {
+            struct stat statA, statB;
+            stat(a.c_str(), &statA);
+            stat(b.c_str(), &statB);
+            return statA.st_mtime > statB.st_mtime;
+        });
     }
 }
 
