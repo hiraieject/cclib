@@ -19,6 +19,8 @@
 #include <stddef.h> // for size_t
 #endif
 
+#include <limits.h> // for PIPE_BUF
+
 #ifdef __cplusplus
 extern "C" {
 #if 0
@@ -35,7 +37,7 @@ enum {
 
 #define CC_MESSAGE_SENDERNAME_MAXLEN 15
 #define CC_MESSAGE_RECEIVERNAME_MAXLEN 15
-#define CC_MESSAGE_JSON_MAXLEN 2000
+#define CC_MESSAGE_JSON_MAXLEN (PIPE_BUF-100)
 
 typedef struct message_packet {
     // basic only
