@@ -129,16 +129,30 @@ cc_message::send_json (nlohmann::json &send_json_obj)
         *p = '\0'; // 終端
 
         // メッセージを送信
+        int ret = -1;
+        int try_count = 0;
+        const int max_retries = 5;
+
+        do {
+            ret = write(send_fd, (void*)&packet, sizeof(packet)); // 送信
+            if (ret == -1) {
+                perror("send_json(): write()");
+                // リトライ回数を増やす
+                try_count++;
+                // 最大リトライ回数に達していない場合、少し待機する
+                if (try_count < max_retries) {
+                    sleep(1); // 1秒待機
+                    CC_MESSAGE_ERRPR("message send retry(%d)\n", try_count);
+                } else {
+                    CC_MESSAGE_ERRPR("message send error\n");
+                    goto FINISH;
+                }
+            }
+        } while (ret == -1); // write() が成功するか、最大リトライ回数に達するまでループ
 #if defined(ENABLE_SENDLOG)
-        CC_MESSAGE_DBGPR ("now send message [%s -> %s]\n",
-                          packet.sender, packet.receiver);
+        CC_MESSAGE_DBGPR("now send message [%s -> %s]\n",
+                         packet.sender, packet.receiver);
 #endif
-        int ret = write (send_fd, (void*)&packet, sizeof(packet)); // 送信
-        if (ret == -1) {
-            perror("write()");
-            CC_MESSAGE_ERRPR ("message send error\n");
-            goto FINISH;
-        }
     }
 
     if (reply_qid == -1) {
