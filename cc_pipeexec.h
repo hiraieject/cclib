@@ -28,12 +28,14 @@ private:
     std::vector<std::string> outputLines;
 public:
     std::mutex mtx;                     ///< 変数保護用MUTEX @n 変数を直接参照する時にはロックすること
+    pid_t pid;
 
     cc_pipeexec(void);
     
     bool executeCommand(std::string &cmd);
     bool getOutputAll(std::vector<std::string> &result);
     bool pipeClose(void);
+    void finish(pid_t finpid);
 
     std::vector<std::string> simpleExecuteCommand(std::string &cmd);
 

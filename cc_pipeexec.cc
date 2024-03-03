@@ -10,17 +10,19 @@
  * 
  */
 
+#include <sys/wait.h> // waitpid()関数を使用するために必要
+
 #include "cclib.h"
 
 cc_pipeexec::cc_pipeexec(void)
 {
     pipe_fd = -1;
+    pid = 0;
 }
     
 bool
 cc_pipeexec::executeCommand(std::string &cmd)
 {
-    pid_t pid;                // fork() が返す pid
     int pipes[2];             // パイプ
 
     // 配列を初期化する
@@ -90,7 +92,6 @@ cc_pipeexec::executeCommand(std::string &cmd)
     }
     // 親プロセス
     close(pipes[1]);          // 親プロセスでは出力しないので閉じる
-
     pipe_fd = pipes[0];
     return true;
 }
@@ -120,6 +121,26 @@ int
 cc_pipeexec::get_fd(void)
 {
     return pipe_fd;
+}
+
+void
+cc_pipeexec::finish(pid_t finpid)
+{
+    if (finpid == 0) {
+        finpid = pid;
+        if (pid == 0) return;
+    }
+    // 子プロセスのPIDを使用してwaitpidを呼び出し、子プロセスの終了を待つ
+    int status;
+    while (waitpid(finpid, &status, 0) == -1) {
+        if (errno != EINTR) { // EINTR以外のエラーの場合
+            perror("waitpid");
+            break;
+        }
+    }
+    if (pid == finpid) {
+        pid = 0;
+    }
 }
 
 std::vector<std::string>
@@ -180,6 +201,8 @@ cc_pipeexec::simpleExecuteCommand(std::string &cmd)
         }
     }
     pipeClose();
+
+    finish(0);
     
     return outputLines;
 }
