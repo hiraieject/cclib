@@ -14,6 +14,7 @@
 #define __CC_MESSAGE_H__
 
 #include <nlohmann/json.hpp>
+#include <sstream>		// for std::ostringstream
 
 #include "cc_message_def.h"
 #include "cc_debugprint.h"
