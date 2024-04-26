@@ -223,7 +223,8 @@ cc_message::open_fifo (int qid, int option)
     // FIFO ファイル名
     std::ostringstream oss;
     oss << "/tmp/fifo." << qid;
-    char *c_fifoname = (char*)oss.str().c_str();
+    std::string fifo_path = oss.str();
+    const char *c_fifoname = fifo_path.c_str();
     
     // FIFO 作成
     if (access(c_fifoname,F_OK) != 0) {
