@@ -2,8 +2,6 @@
 BUILD_TOP_DIR = .
 include $(BUILD_TOP_DIR)/conf/makefile.inc
 
-BUILDTYPE := Debug
-
 CSRCS    =
 #CSRCS   += c_message.c
 CCSRCS   =
