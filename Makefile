@@ -5,14 +5,14 @@ include $(BUILD_TOP_DIR)/conf/makefile.inc
 BUILDTYPE := Debug
 
 CSRCS    =
-CSRCS   += c_message.c
+#CSRCS   += c_message.c
 CCSRCS   =
-CCSRCS  += cc_message.cc
+#CCSRCS  += cc_message.cc
 CCSRCS  += cc_thread.cc
-CCSRCS  += cc_tcpcomm.cc
+#CCSRCS  += cc_tcpcomm.cc
 # CCSRCS  += cc_udpcomm.cc
-CCSRCS  += cc_pipeexec.cc
-CCSRCS  += cc_misc.cc
+#CCSRCS  += cc_pipeexec.cc
+#CCSRCS  += cc_misc.cc
 CPPSRCS += 
 TARGET   = cclib.a
 
