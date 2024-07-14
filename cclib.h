@@ -13,6 +13,7 @@
 #ifndef __CCLIB_H__
 #define __CCLIB_H__
 
+#include "cc_nmsgq.h"
 #include "cc_message.h"
 #include "cc_thread.h"
 #include "cc_pipeexec.h"

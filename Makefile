@@ -2,6 +2,8 @@
 BUILD_TOP_DIR = .
 include $(BUILD_TOP_DIR)/conf/makefile.inc
 
+BUILDTYPE := Debug
+
 CSRCS    =
 CSRCS   += c_message.c
 CCSRCS   =
@@ -153,9 +155,20 @@ sample_try_exception_run:
 	-$(OBJDIR)/sample_try_exception -c
 	-$(OBJDIR)/sample_try_exception -C
 
+# ------------------------------------------------------ sample_nmsgq
+sample_nmsgq:
+	make BUILDTYPE=Debug all
+	make BUILDTYPE=Debug _sample_nmsgq
+
+_sample_nmsgq: $(OBJDIR)/sample_nmsgq
+
+$(OBJDIR)/sample_nmsgq: sample_nmsgq.cc $(OBJDIR)/$(TARGET)
+	$(CPP) -Wl,--start-group sample_nmsgq.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+
+sample_nmsgq_run:
+	$(OBJDIR)/sample_nmsgq
 
 -include $(OBJDIR)/*/*.d
-
 # ------------------------------------------------------ for me
 -include ~/.dotfiles/.makefile.gitbase.inc
 

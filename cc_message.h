@@ -19,6 +19,7 @@
 #include "cc_message_def.h"
 #include "cc_debugprint.h"
 
+#define USE_STD_MSGQMGR
 
 #define MKSENDSTR(_sender,_receiver,_json_str)                            \
     (R"({"sender":")" _sender R"(","receiver":")" _receiver R"(",)" _json_str R"(})")
