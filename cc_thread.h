@@ -19,7 +19,7 @@
 #include <mutex>
 
 #include "cc_debugprint.h"
-//#include "cc_message.h"
+#include "cc_message.h"
 
 /**
  * @class cc_thread
@@ -39,8 +39,7 @@ protected:
     
 public:
     // public functions
-    //cc_thread (key_t message_key, std::string nickname);           // コンストラクター
-    cc_thread (int message_key, std::string nickname);           // コンストラクター
+    cc_thread (key_t message_key, std::string nickname);           // コンストラクター
     ~cc_thread ();                              // デストラクター
 
     void set_loop_continue(bool enb);           // ループ継続判定設定
@@ -53,7 +52,7 @@ public:
     // public variables
     std::string nickname;                       ///< ニックネーム
     cc_debugprint thread_dbg;                   ///< cclib debugprint
-    //cc_message message;                         ///< cclib message
+    cc_message message;                         ///< cclib message
 };
 
 #endif// __CC_THREAD_H__

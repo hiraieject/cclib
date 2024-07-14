@@ -28,11 +28,9 @@
  * @brief コンストラクター
  * @param nickname     ニックネーム文字列(デバックプリントで使用)
  */
-//cc_thread::cc_thread (key_t message_key, std::string nickname) :
-cc_thread::cc_thread (int message_key, std::string nickname) :
-    thread_dbg (nickname)
-    //,
-    //message(message_key,nickname,true/*master_flag*/)
+cc_thread::cc_thread (key_t message_key, std::string nickname) :
+    thread_dbg (nickname),
+    message(message_key,nickname,true/*master_flag*/)
 {
     CC_THREAD_DBGPR ("instance created\n");
 
