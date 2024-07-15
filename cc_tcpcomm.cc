@@ -16,8 +16,8 @@
 // ===================================================================================== TCP CLIENT
 // =====================================================================================
 
-cc_tcpconnect::cc_tcpconnect (key_t message_key, std::string nickname) :
-    cc_thread (message_key, nickname),
+cc_tcpconnect::cc_tcpconnect (std::string nickname) :
+    cc_thread (nickname),
     tcpcomm_dbg (nickname)
 {
     // すべてのインスタンスの debugprint をまとめてオンにする
@@ -217,8 +217,8 @@ cc_tcpserver::thread_main (void)
     CC_TCPCOMM_DBGPR ("conn waiting thread: thread down\n");
 }
 
-cc_tcpserver::cc_tcpserver (key_t message_key, std::string nickname) :
-    cc_thread (message_key, nickname)
+cc_tcpserver::cc_tcpserver (std::string nickname) :
+    cc_thread (nickname)
 {
     // すべてのインスタンスの debugprint をまとめてオンにする
     //tcpcomm_dbg.enable();
@@ -249,7 +249,7 @@ cc_tcpserver::~cc_tcpserver ()
 cc_tcpconnect *
 cc_tcpserver::create_conn (void)
 {
-    return new cc_tcpconnect(-1,"cc_tcpconnect");
+    return new cc_tcpconnect("cc_tcpconnect");
 }
 
 bool

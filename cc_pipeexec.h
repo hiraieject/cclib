@@ -13,6 +13,14 @@
 #ifndef __CC_PIPEEXEC_H__
 #define __CC_PIPEEXEC_H__
 
+#define AVAILABLE_PIPEEXEC
+#ifndef __MINGW64__
+#undef AVAILABLE_PIPEEXEC
+#endif
+
+
+#ifdef AVAILABLE_PIPEEXEC
+
 #include <iostream>
 #include <cstdio>
 #include <vector>
@@ -42,5 +50,6 @@ public:
     int get_fd(void);
 };
 
+#endif // AVAILABLE_PIPEEXEC
 
 #endif // __CC_PIPEEXEC_H__

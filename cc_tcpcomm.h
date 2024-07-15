@@ -43,7 +43,7 @@ public:
     int clientSocket;
     struct sockaddr_in clientAddress;
 
-    cc_tcpconnect (key_t message_key, std::string nickname);
+    cc_tcpconnect (std::string nickname);
     //cc_tcpconnect (void);
     virtual ~cc_tcpconnect ();
 
@@ -79,7 +79,7 @@ private:
 
 public:
     //cc_tcpserver (void);
-    cc_tcpserver (key_t message_key, std::string nickname);
+    cc_tcpserver (std::string nickname);
     virtual ~cc_tcpserver ();
 
     virtual void thread_main (void);

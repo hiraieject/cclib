@@ -2,9 +2,9 @@
 #include <unistd.h>  // sleep() を使用するために必要
 
 #include "cc_thread.h"
-#include "cc_nmsgq.h"
+#include "cc_message.h"
 
-cc_nMsgQueMgr quemgr;
+cc_message_manager message_mgr;
 
 // ===========================================================
 class Thread1 : public cc_thread {
@@ -14,23 +14,22 @@ private:
     void thread_main (void);
     
 public:
-    cc_nMsgQue que;
+    cc_message message;
     bool polling;
 
-    Thread1() :
-        cc_thread(0, "thread1"),
-        dbg("thread1")
+    Thread1(std::string nickname) : 
+        cc_thread(nickname),
+        dbg(nickname),
+        message(nickname), polling(false)
     {
         dbg.enable();
         thread_dbg.disable();
-        quemgr.get_que(que);    // QUEを確保
 
         // スレッドを立ち上げる
         thread_up();
     }
     ~Thread1(void) {
         thread_down();
-        quemgr.destroy_que(que);
     }
 };
 
@@ -42,28 +41,27 @@ private:
     void thread_main (void);
     
 public:
-    cc_nMsgQue que;
+    cc_message message;
     bool polling;
    
-    Thread2() :
-        cc_thread(0, "thread2"),
-        dbg("thread2")
+    Thread2(std::string nickname) : 
+        cc_thread(nickname),
+        dbg(nickname),
+        message(nickname), polling(false)
     {
         dbg.enable();
         thread_dbg.disable();
-        quemgr.get_que(que);    // QUEを確保
 
         // スレッドを立ち上げる
         thread_up();
     }
     ~Thread2(void) {
         thread_down();
-        quemgr.destroy_que(que);
     }
 };
 
-Thread1 th1;
-Thread2 th2;
+Thread1 th1("thread[1]");
+Thread2 th2("thread[2]");
 
 // ===========================================================
 void Thread1::thread_main (void) {
@@ -75,11 +73,11 @@ void Thread1::thread_main (void) {
     try {
         while (loop_continue()) {
         
-            // QUE受信処理
-            que.wait(100/*msec*/);
-            while (!que.is_empty()) {
+            // MESSAGE受信処理
+            message.wait(100/*msec*/);
+            while (!message.is_empty()) {
                 // 受信データあり
-                cc_nMsgPacket *packetp = que.ref_front();
+                cc_message_packet *packetp = message.ref_front();
                 if (packetp) {
                     nlohmann::json *json_objp = packetp->ref_json_obj();
                     if (json_objp) {
@@ -97,7 +95,7 @@ void Thread1::thread_main (void) {
                         DBGPR ("recv: empty str\n");
                     }
                 }
-                que.pop();;
+                message.pop();;
             }
 
             // 定期処理 100msec or less cycle
@@ -114,9 +112,9 @@ void Thread1::thread_main (void) {
                 // 定期コマンド送信
                 nlohmann::json json_obj;
                 json_obj["action"] = "command";
-                cc_nMsgPacket packet;
+                cc_message_packet packet;
                 packet.set_json_obj(json_obj);
-                th2.que.push(packet);
+                th2.message.push(packet);
             }
         }
 
@@ -136,26 +134,28 @@ void Thread2::thread_main (void) {
     try {
         while (loop_continue()) {
         
-            // QUE受信処理
-            que.wait(100/*msec*/);
-            while (!que.is_empty()) {
+            // MESSAGE受信処理
+            message.wait(100/*msec*/);
+            while (!message.is_empty()) {
                 // 受信データあり
-                cc_nMsgPacket *packetp = que.ref_front();
+                cc_message_packet *packetp = message.ref_front();
                 if (packetp) {
                     nlohmann::json *json_objp = packetp->ref_json_obj();
                     if (json_objp) {
                         std::string action = (*json_objp)["action"];
 
                         if (action == "command") {
-                            DBGPR ("recv: action=%s\n", action.c_str());
+                            std::string *json_strp = packetp->ref_json_str();
+                            DBGPR ("recv: json   = %s\n", json_strp->c_str());
+                            DBGPR ("recv: action = %s\n", action.c_str());
 
                             // 返信送信
                             nlohmann::json json_obj;
                             json_obj["action"] = "result";
                             json_obj["value"]  = "ok";
-                            cc_nMsgPacket packet;
+                            cc_message_packet packet;
                             packet.set_json_obj(json_obj);
-                            th1.que.push(packet);
+                            th1.message.push(packet);
                         
                         } else {
                             DBGPR ("recv: unknown action=%s\n", action.c_str());
@@ -165,7 +165,7 @@ void Thread2::thread_main (void) {
                         DBGPR ("recv: empty str\n");
                     }
                 }
-                que.pop();;
+                message.pop();;
             }
 
             // 定期処理 100msec or less cycle

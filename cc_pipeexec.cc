@@ -14,6 +14,8 @@
 
 #include "cclib.h"
 
+#ifdef AVAILABLE_PIPEEXEC
+
 cc_pipeexec::cc_pipeexec(void)
 {
     pipe_fd = -1;
@@ -225,4 +227,5 @@ cc_pipeexec::simpleExecuteCommand(std::string &cmd)
 //    return 0;
 //}
 
+#endif // AVAILABLE_PIPEEXEC
 

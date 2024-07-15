@@ -3,14 +3,11 @@ BUILD_TOP_DIR = .
 include $(BUILD_TOP_DIR)/conf/makefile.inc
 
 CSRCS    =
-#CSRCS   += c_message.c
 CCSRCS   =
-#CCSRCS  += cc_message.cc
-CCSRCS  += cc_thread.cc
-#CCSRCS  += cc_tcpcomm.cc
+CCSRCS  += cc_tcpcomm.cc
 # CCSRCS  += cc_udpcomm.cc
-#CCSRCS  += cc_pipeexec.cc
-#CCSRCS  += cc_misc.cc
+CCSRCS  += cc_pipeexec.cc
+CCSRCS  += cc_misc.cc
 CPPSRCS += 
 TARGET   = cclib.a
 
@@ -153,18 +150,18 @@ sample_try_exception_run:
 	-$(OBJDIR)/sample_try_exception -c
 	-$(OBJDIR)/sample_try_exception -C
 
-# ------------------------------------------------------ sample_nmsgq
-sample_nmsgq:
+# ------------------------------------------------------ sample_message
+sample_message:
 	make BUILDTYPE=Debug all
-	make BUILDTYPE=Debug _sample_nmsgq
+	make BUILDTYPE=Debug _sample_message
 
-_sample_nmsgq: $(OBJDIR)/sample_nmsgq
+_sample_message: $(OBJDIR)/sample_message
 
-$(OBJDIR)/sample_nmsgq: sample_nmsgq.cc $(OBJDIR)/$(TARGET)
-	$(CPP) -Wl,--start-group sample_nmsgq.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
+$(OBJDIR)/sample_message: sample_message.cc $(OBJDIR)/$(TARGET)
+	$(CPP) -Wl,--start-group sample_message.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $@
 
-sample_nmsgq_run:
-	$(OBJDIR)/sample_nmsgq
+sample_message_run:
+	$(OBJDIR)/sample_message
 
 -include $(OBJDIR)/*/*.d
 # ------------------------------------------------------ for me
