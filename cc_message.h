@@ -11,6 +11,8 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 
+#include "cc_debugprint.h"
+
 /**
  * @file cc_message.h
  * @brief スレッド間メッセージ通信
@@ -23,6 +25,20 @@
 class cc_message_manager;
 extern cc_message_manager message_mgr;
 
+/// デバックするときはtrueにする、リリース時はfalse化すること
+#define CC_MESSAGE_DEBUGPRINT true
+//#define CC_MESSAGE_DEBUGPRINT false
+
+
+/// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
+#define CC_MESSAGE_ERRPR(fmt, args...) \
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+/// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
+#define CC_MESSAGE_WARNPR(fmt, args...) \
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+/// デバックプリント デバック表示用マクロ、enableのときだけ表示
+#define CC_MESSAGE_DBGPR(fmt, args...) \
+    if (message_dbg.enable_flg || CC_MESSAGE_DEBUGPRINT) { printf("[%s:%s():%d] " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 // ===========================================================================================================
 // 
@@ -31,14 +47,17 @@ extern cc_message_manager message_mgr;
  * @brief キューで送るメッセージパケットクラス
  */
 class cc_message_packet {
-public:
+private:
+    std::string sender;
     nlohmann::json json_obj;
     std::string json_str;
     bool json_obj_valid;
     bool json_str_valid;
+    
+public:
 
     // ------------------- constructor/destructor
-    cc_message_packet() : json_obj_valid(false), json_str_valid(false) {}
+    cc_message_packet(std::string arg_sender) : sender(arg_sender), json_obj_valid(false), json_str_valid(false) {}
 
     // ------------------- public methods
     void set_json_obj(const nlohmann::json &arg_json_obj) {
@@ -66,6 +85,9 @@ public:
             json_str_valid = true;
         }
         return json_str_valid ? &json_str : nullptr;
+    }
+    std::string *ref_sender() {
+        return &sender;
     }
 };
 
@@ -166,14 +188,17 @@ public:
  * インスタンス内にはキューの実体は無く、 cc_message_resource  インスタンスへの参照となっている
  */
 class cc_message {
-public:
+private:
     int                  que_resource_qid;
     cc_message_resource *que_resource_ptr;
     std::string          nickname;
+    cc_debugprint        message_dbg;
+    
+public:
     
     // ------------------- constructor/destructor/内部関数
     cc_message(std::string arg_nickname, int qid=-1);
-    
+    ~cc_message();
 
     /// 内部関数：QUEリソースをセット
     void set_resource(cc_message_resource *arg_que_resource, int arg_que_resource_qid) {
@@ -199,6 +224,19 @@ public:
         if (!que_resource_ptr)
             return;
         que_resource_ptr->pop();
+    }
+
+    /// JSON(OBJ)送信
+    void send_json (std::string sender, nlohmann::json &json_obj) {
+        cc_message_packet packet(sender);
+        packet.set_json_obj(json_obj);
+        push(packet);
+    }
+    /// JSON(STR)送信
+    void send_json (std::string sender, std::string &json_str) {
+        cc_message_packet packet(sender);
+        packet.set_json_str(json_str);
+        push(packet);
     }
 
     /// 有効状態の取得
@@ -283,9 +321,19 @@ public:
 
 // ===========================================================================================================
 inline cc_message::cc_message(std::string arg_nickname, int qid) :
-    que_resource_qid(-1), que_resource_ptr(nullptr), nickname(arg_nickname)
+    que_resource_qid(-1), que_resource_ptr(nullptr), nickname(arg_nickname), message_dbg("DBG:CC_MESSAGE("+arg_nickname+")")
 {
+#ifdef CC_MESSAGE_DEBUGPRINT
+    message_dbg.enable();
+#endif // CC_MESSAGE_DEBUGPRINT
+
     message_mgr.get_message(*this);    // MESSAGEを確保
+    
+    CC_MESSAGE_DBGPR("CC_MESSAGE(qid=%d) instance created\n", que_resource_qid);
+}
+
+inline cc_message::~cc_message() {
+    CC_MESSAGE_DBGPR("CC_MESSAGE(qid=%d) instance deleted\n", que_resource_qid);
 }
 
 #endif // __CC_NMSGQ_H__

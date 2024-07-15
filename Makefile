@@ -6,7 +6,6 @@ CSRCS    =
 CCSRCS   =
 CCSRCS  += cc_tcpcomm.cc
 # CCSRCS  += cc_udpcomm.cc
-CCSRCS  += cc_pipeexec.cc
 CCSRCS  += cc_misc.cc
 CPPSRCS += 
 TARGET   = cclib.a
@@ -162,6 +161,20 @@ $(OBJDIR)/sample_message: sample_message.cc $(OBJDIR)/$(TARGET)
 
 sample_message_run:
 	$(OBJDIR)/sample_message
+
+# ------------------------------------------------------ pipeexec unittest
+test_pipeexec:
+	make BUILDTYPE=Debug all
+	echo "#define UNIT_TEST_SAMPLE" > unittest.cc
+	echo "#include \"cc_pipeexec.h\"" >> unittest.cc
+
+	make BUILDTYPE=Debug run_unittest
+
+# ------------------------------------------------------ unittest
+run_unittest:
+	-$(CPP) -Wl,--start-group unittest.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $(OBJDIR)/unittest
+	-$(OBJDIR)/unittest
+	rm -f unittest.cc
 
 -include $(OBJDIR)/*/*.d
 # ------------------------------------------------------ for me

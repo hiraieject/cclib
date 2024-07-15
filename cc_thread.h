@@ -21,6 +21,10 @@
 #include "cc_debugprint.h"
 #include "cc_message.h"
 
+/// デバックするときはtrueにする、リリース時はfalse化すること
+#define CC_THREAD_DEBUGPRINT true
+//#define CC_THREAD_DEBUGPRINT false
+
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_ERRPR(fmt, args...) \
     { printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
@@ -29,10 +33,7 @@
     { printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 /// デバックプリント デバック表示用マクロ、enableのときだけ表示
 #define CC_THREAD_DBGPR(fmt, args...) \
-    if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
-
-/// デバックするときは有効にする、リリース時は無効化すること
-#define CC_THREAD_DEBUGPRINT
+    if (thread_dbg.enable_flg || CC_THREAD_DEBUGPRINT) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
 
 // ===========================================================================================================
 /**
@@ -72,14 +73,9 @@ public:
      */
     cc_thread (std::string arg_nickname) :
         thread_obj(), thread_loop(false), thread_enable(false),
-        nickname(arg_nickname), thread_dbg(arg_nickname), message(arg_nickname)
+        nickname(arg_nickname), thread_dbg("DBG:CC_THREAD("+arg_nickname+")"), message(arg_nickname)
     {
         CC_THREAD_DBGPR ("instance created\n");
-        
-        // debugprint をまとめてオンにする
-#ifdef CC_THREAD_DEBUGPRINT
-        thread_dbg.enable();
-#endif
     }
     
     /// デストラクター
@@ -145,6 +141,16 @@ public:
         thread_obj.detach();
         CC_THREAD_DBGPR ("thread detached\n");
     }
+
+    /// JSON(OBJ)送信
+    void send_json (std::string sender, nlohmann::json &json_obj) {
+        message.send_json (sender, json_obj);
+    }
+    /// JSON(STR)送信
+    void send_json (std::string sender, std::string &json_str) {
+        message.send_json (sender, json_str);
+    }
+    
 };
 
 #endif// __CC_THREAD_H__

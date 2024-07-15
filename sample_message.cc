@@ -14,13 +14,11 @@ private:
     void thread_main (void);
     
 public:
-    cc_message message;
     bool polling;
 
     Thread1(std::string nickname) : 
         cc_thread(nickname),
-        dbg(nickname),
-        message(nickname), polling(false)
+        dbg(nickname)
     {
         dbg.enable();
         thread_dbg.disable();
@@ -41,13 +39,11 @@ private:
     void thread_main (void);
     
 public:
-    cc_message message;
     bool polling;
    
     Thread2(std::string nickname) : 
         cc_thread(nickname),
-        dbg(nickname),
-        message(nickname), polling(false)
+        dbg(nickname)
     {
         dbg.enable();
         thread_dbg.disable();
@@ -84,7 +80,10 @@ void Thread1::thread_main (void) {
                         std::string action = (*json_objp)["action"];
 
                         if (action == "result") {
+                            std::string *json_strp = packetp->ref_json_str();
                             std::string value = (*json_objp)["value"];
+                            DBGPR ("recv: sender = %s\n", packetp->ref_sender()->c_str());
+                            DBGPR ("recv: json   = %s\n", json_strp->c_str());
                             DBGPR ("recv: action=%s value=%s\n", action.c_str(), value.c_str());
 
                         } else {
@@ -112,7 +111,7 @@ void Thread1::thread_main (void) {
                 // 定期コマンド送信
                 nlohmann::json json_obj;
                 json_obj["action"] = "command";
-                cc_message_packet packet;
+                cc_message_packet packet(nickname);
                 packet.set_json_obj(json_obj);
                 th2.message.push(packet);
             }
@@ -146,6 +145,7 @@ void Thread2::thread_main (void) {
 
                         if (action == "command") {
                             std::string *json_strp = packetp->ref_json_str();
+                            DBGPR ("recv: sender = %s\n", packetp->ref_sender()->c_str());
                             DBGPR ("recv: json   = %s\n", json_strp->c_str());
                             DBGPR ("recv: action = %s\n", action.c_str());
 
@@ -153,9 +153,7 @@ void Thread2::thread_main (void) {
                             nlohmann::json json_obj;
                             json_obj["action"] = "result";
                             json_obj["value"]  = "ok";
-                            cc_message_packet packet;
-                            packet.set_json_obj(json_obj);
-                            th1.message.push(packet);
+                            th1.send_json(nickname, json_obj);
                         
                         } else {
                             DBGPR ("recv: unknown action=%s\n", action.c_str());
