@@ -17,7 +17,8 @@ endif
 CPPFLAGS  += -g -MD
 CPPFLAGS  += -Wall
 CPPFLAGS  += -Werror
-CPPFLAGS  += -std=gnu++11
+#CPPFLAGS  += -std=gnu++11
+CPPFLAGS  += -std=gnu++17
 CPPFLAGS  += $(COMMONCFLAGS)
 
 CC         = gcc

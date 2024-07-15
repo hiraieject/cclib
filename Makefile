@@ -4,7 +4,7 @@ include $(BUILD_TOP_DIR)/conf/makefile.inc
 
 CSRCS    =
 CCSRCS   =
-CCSRCS  += cc_tcpcomm.cc
+#CCSRCS  += cc_tcpcomm.cc
 # CCSRCS  += cc_udpcomm.cc
 CCSRCS  += cc_misc.cc
 CPPSRCS += 
@@ -168,12 +168,22 @@ test_pipeexec:
 	echo "#define UNIT_TEST_SAMPLE" > unittest.cc
 	echo "#include \"cc_pipeexec.h\"" >> unittest.cc
 
-	make BUILDTYPE=Debug run_unittest
+	make run_unittest
 
-# ------------------------------------------------------ unittest
+# ------------------------------------------------------ hello world
+test_hello:
+	make BUILDTYPE=Debug all
+	echo "#include <stdio.h>" > unittest.cc
+	echo "main() { printf(\"Hello World\\n\"); }" >> unittest.cc
+
+	make run_unittest
+
+# ------------------------------------------------------ BUILD & RUN unittest
 run_unittest:
 	-$(CPP) -Wl,--start-group unittest.cc $(OBJDIR)/$(TARGET) -Wl,--end-group -o $(OBJDIR)/unittest
+	@echo -n "============================ "
 	-$(OBJDIR)/unittest
+	@echo "============================ "
 	rm -f unittest.cc
 
 -include $(OBJDIR)/*/*.d

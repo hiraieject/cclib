@@ -1,3 +1,5 @@
+/* -*- Mode: C++; tab-width: 8; c-basic-offset: 4 -*- */
+
 #ifndef __CC_MESSAGE_H__
 #define __CC_MESSAGE_H__
 

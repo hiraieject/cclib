@@ -136,7 +136,7 @@ void Thread2::thread_main (void) {
             // MESSAGE受信処理
             message.wait(100/*msec*/);
             while (!message.is_empty()) {
-                // 受信データあり
+	        // 受信データあり
                 cc_message_packet *packetp = message.ref_front();
                 if (packetp) {
                     nlohmann::json *json_objp = packetp->ref_json_obj();
