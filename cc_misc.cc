@@ -287,3 +287,16 @@ cc_removeFile(const std::string& filename)
         throw std::runtime_error("Failed to delete file\n\nFilename: " + filename);
     }
 }
+
+// WindowsスタイルのパスをMINGWスタイルのパスに変換する関数
+std::string
+cc_winPathToMingwPath(const std::string& windowsPath) {
+    if (windowsPath.length() < 2 || windowsPath[1] != ':') {
+        // パスが "C:\..." のような形式でない場合はエラー
+        return "";
+    }
+
+    std::string mingwPath = "/" + std::string(1, tolower(windowsPath[0])) + windowsPath.substr(2);
+    std::replace(mingwPath.begin(), mingwPath.end(), '\\', '/');
+    return mingwPath;
+}

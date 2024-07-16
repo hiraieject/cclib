@@ -32,5 +32,6 @@ std::string cc_readFileBody(const std::string& filename);
 
 void cc_writeFileBody(const std::string& filename, const std::string& content);
 
+std::string cc_winPathToMingwPath(const std::string& windowsPath);
 
 #endif // __CC_MISC_H__
