@@ -38,7 +38,7 @@ public:
     pid_t pid;
 
     // ------------------- constructor/destructor/内部関数
-    cc_pipeexec(void) : pipe_fd(-1), outputModified(false), pid(0) {}
+    cc_pipeexec(void) : pid(0), pipe_fd(-1), outputModified(false) {}
     
     // ------------------- ユーザー向け public methods
 
