@@ -46,10 +46,12 @@ public:
     std::string nickname;                       ///< デバックプリントで表示するニックネーム
 };
 #define ERRPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### ERROR!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 #define WARNPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### WARNING!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
+#define INFOPR(fmt, args...) \
+    { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 #define DBGPR(fmt, args...) \
-    if (dbg.enable_flg) { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (dbg.enable_flg) { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 
 #endif // __CC_DEBUGPRINT_H__

@@ -14,13 +14,13 @@
 
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_ERRPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 /// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
 #define CC_THREAD_WARNPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 /// デバックプリント デバック表示用マクロ、enableのときだけ表示
 #define CC_THREAD_DBGPR(fmt, args...) \
-    if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (thread_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,thread_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 
 // -------------------------------------------------------------------------------------------
 

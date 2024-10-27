@@ -19,13 +19,13 @@
 
 /// デバックプリント エラー表示用マクロ、enableの是非に関わらず表示
 #define CC_MESSAGE_ERRPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### ERROR!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### ERROR!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 /// デバックプリント ワーニング表示用マクロ、enableの是非に関わらず表示
 #define CC_MESSAGE_WARNPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### WARNING!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    { printf("[%s:%s():%d] ##### WARNING!: " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 /// デバックプリント デバック表示用マクロ、enableのときだけ表示
 #define CC_MESSAGE_DBGPR(fmt, args...) \
-    if (message_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); }
+    if (message_dbg.enable_flg) { printf("[%s:%s():%d] " fmt,message_dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 
 
 cc_message_base::cc_message_base (std::string nickname)
