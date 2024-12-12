@@ -40,18 +40,28 @@ public:
     void disable(void) {                        ///< デバックプリントを無効にする
         this->enable_flg = false;
     }
+    char *ts(void) {                            ///< "[HH:MM:SS]" 時刻文字列を返す
+        // 現在時刻を取得
+        std::time_t t = std::time(nullptr);
+        std::tm* now = std::localtime(&t);
+        // 静的バッファに時刻を保存
+        static char time_str[20];  // "[HH:MM:SS]" に必要なバッファ長は 10
+        std::snprintf(time_str, sizeof(time_str), "[%02d:%02d:%02d]",
+                      now->tm_hour, now->tm_min, now->tm_sec);
+        return time_str;
+    }
 
     // public variables
     bool enable_flg;                            ///< デバックプリントの有効/無効フラグ
     std::string nickname;                       ///< デバックプリントで表示するニックネーム
 };
 #define ERRPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### ERROR!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
+    { printf("%s [%s:%s():%d] ##### ERROR!: " fmt,dbg.ts(),dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 #define WARNPR(fmt, args...) \
-    { printf("[%s:%s():%d] ##### WARNING!: " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
+    { printf("%s [%s:%s():%d] ##### WARNING!: " fmt,dbg.ts(),dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 #define INFOPR(fmt, args...) \
-    { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
+    { printf("%s [%s:%s():%d] " fmt,dbg.ts(),dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 #define DBGPR(fmt, args...) \
-    if (dbg.enable_flg) { printf("[%s:%s():%d] " fmt,dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
+    if (dbg.enable_flg) { printf("%s [%s:%s():%d] " fmt,dbg.ts(),dbg.nickname.c_str(),__FUNCTION__,__LINE__, ## args); fflush(stdout); }
 
 #endif // __CC_DEBUGPRINT_H__
