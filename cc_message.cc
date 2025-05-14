@@ -86,6 +86,7 @@ cc_message::receiver_recv_json_str (void)
                       packet.sender, packet.recver);
 #endif
     json_str = packet.json_str;
+    free(packet.json_str);
 
  FINISH:
     return json_str;
@@ -123,10 +124,11 @@ cc_message::send_json (nlohmann::json &send_json_obj)
         p = stpncpy (packet.receiver, receiver.c_str(),
                      CC_MESSAGE_RECEIVERNAME_MAXLEN);
         *p = '\0'; // 終端
-        p = stpncpy (packet.json_str,
-                     send_json_obj.dump().c_str(),
-                     CC_MESSAGE_JSON_MAXLEN);
-        *p = '\0'; // 終端
+        //p = stpncpy (packet.json_str,
+        //             send_json_obj.dump().c_str(),
+        //             CC_MESSAGE_JSON_MAXLEN);
+        //*p = '\0'; // 終端
+        packet.json_str = strdup(send_json_obj.dump().c_str());
 
         // メッセージを送信
         int ret = -1;

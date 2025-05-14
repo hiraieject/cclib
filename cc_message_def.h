@@ -37,8 +37,9 @@ enum {
 
 #define CC_MESSAGE_SENDERNAME_MAXLEN 15
 #define CC_MESSAGE_RECEIVERNAME_MAXLEN 15
-#define CC_MESSAGE_JSON_MAXLEN (PIPE_BUF-100)
-
+//#define CC_MESSAGE_JSON_MAXLEN (PIPE_BUF-100)
+#define CC_MESSAGE_JSON_MAXLEN (1024*6)
+ 
 typedef struct message_packet {
     // basic only
     int  com;                 //< q command   : must not 0
@@ -46,7 +47,8 @@ typedef struct message_packet {
     int  result;              //< result core : 0:OK, other:NG
     char sender[CC_MESSAGE_SENDERNAME_MAXLEN+1];
     char receiver[CC_MESSAGE_RECEIVERNAME_MAXLEN+1];
-    char json_str[CC_MESSAGE_JSON_MAXLEN+1];  ///< JSON 文字列
+    //char json_str[CC_MESSAGE_JSON_MAXLEN+1];  ///< JSON 文字列
+    char *json_str;  ///< JSON 文字列
 } message_packet;
 
 #ifdef __cplusplus
